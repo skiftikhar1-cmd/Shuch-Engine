@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080808" />
+  <title>Rise From Broken — Search Beyond Limits</title>
+  <link rel="icon" type="image/png" href="assets/rise-from-broken-logo.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="grain"></div>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Rise From Broken home">
+      <img src="assets/rise-from-broken-logo.png" alt="Rise From Broken logo" />
+      <span>RISE FROM BROKEN</span>
+    </a>
+    <nav>
+      <a href="#about">About</a>
+      <button id="themeBtn" class="icon-btn" aria-label="Toggle theme">◐</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-logo">
+        <img src="assets/rise-from-broken-logo.png" alt="Rise From Broken pirate logo" />
+      </div>
+      <p class="eyebrow">RISE FROM BROKEN PRESENTS</p>
+      <h1>Search <span>Beyond</span><br/>Limits.</h1>
+      <p class="tagline">Fast. Clean. Focused. <b>RISE FROM BROKEN</b> is built to find what matters.</p>
+
+      <form id="searchForm" class="search-box">
+        <span class="search-icon">⌕</span>
+        <input id="searchInput" type="search" autocomplete="off"
+               placeholder="Search the web..." aria-label="Search the web" />
+        <button type="submit">SEARCH</button>
+      </form>
+
+      <div id="suggestions" class="suggestions" hidden></div>
+      <p class="hint">Try: <button class="quick" data-q="Python programming">Python programming</button>
+        <button class="quick" data-q="Cyber security">Cyber security</button>
+        <button class="quick" data-q="Web development">Web development</button></p>
+    </section>
+
+    <section class="results-wrap" id="resultsSection" hidden>
+      <div class="results-head">
+        <div>
+          <span class="eyebrow">SEARCH RESULTS</span>
+          <h2 id="resultsTitle">Results</h2>
+        </div>
+        <span id="resultCount" class="count"></span>
+      </div>
+      <div id="results"></div>
+      <div id="emptyState" class="empty" hidden>
+        <div class="empty-mark">⌕</div>
+        <h3>No results found</h3>
+        <p>Try another keyword or a broader search.</p>
+      </div>
+    </section>
+
+    <section class="features" id="about">
+      <div class="section-label">WHY RISE FROM BROKEN</div>
+      <div class="feature-grid">
+        <article><b>01</b><h3>Lightweight</h3><p>No clutter. A fast interface designed around the search.</p></article>
+        <article><b>02</b><h3>Relevant</h3><p>Ranking can grow from simple text matching into a smarter engine.</p></article>
+        <article><b>03</b><h3>Private-minded</h3><p>Built so your search experience can stay focused and transparent.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© 2026 RISE FROM BROKEN</span>
+    <span>RISE FROM BROKEN</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
