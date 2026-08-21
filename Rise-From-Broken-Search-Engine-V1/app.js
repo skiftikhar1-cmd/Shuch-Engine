@@ -1,10 +1,10 @@
+"use strict";
+
 /* =========================================================
-   RISE FROM BROKEN — FINAL SEARCH ENGINE
-   All + Images + Videos + News
+   RISE FROM BROKEN — SEARCH ENGINE
    Supabase + Wikipedia + Wikimedia + Google News
 ========================================================= */
 
-"use strict";
 
 /* =========================================================
    CONFIG
@@ -22,35 +22,19 @@ let supabaseClient = null;
 const form = document.querySelector("#searchForm");
 const input = document.querySelector("#searchInput");
 
-const resultsSection =
-  document.querySelector("#resultsSection");
+const resultsSection = document.querySelector("#resultsSection");
+const results = document.querySelector("#results");
+const emptyState = document.querySelector("#emptyState");
 
-const results =
-  document.querySelector("#results");
+const title = document.querySelector("#resultsTitle");
+const count = document.querySelector("#resultCount");
 
-const emptyState =
-  document.querySelector("#emptyState");
+const suggestions = document.querySelector("#suggestions");
+const tabs = document.querySelectorAll(".search-tab");
 
-const title =
-  document.querySelector("#resultsTitle");
-
-const count =
-  document.querySelector("#resultCount");
-
-const suggestions =
-  document.querySelector("#suggestions");
-
-const tabs =
-  document.querySelectorAll(".search-tab");
-
-const loadingState =
-  document.querySelector("#loadingState");
-
-const clearBtn =
-  document.querySelector("#clearBtn");
-
-const voiceBtn =
-  document.querySelector("#voiceBtn");
+const loadingState = document.querySelector("#loadingState");
+const clearBtn = document.querySelector("#clearBtn");
+const voiceBtn = document.querySelector("#voiceBtn");
 
 
 /* =========================================================
@@ -62,233 +46,226 @@ let currentTab = "all";
 
 
 /* =========================================================
-   SUPABASE
+   SUPABASE INITIALIZATION
 ========================================================= */
 
 function initSupabase() {
 
-  if (
-    !cfg.SUPABASE_URL ||
-    !cfg.SUPABASE_ANON_KEY
-  ) {
-    return;
-  }
+    if (
+        !cfg.SUPABASE_URL ||
+        !cfg.SUPABASE_ANON_KEY
+    ) {
+        console.warn("Supabase configuration missing.");
+        return;
+    }
 
-  if (
-    !window.supabase ||
-    typeof window.supabase.createClient !== "function"
-  ) {
-    console.warn("Supabase library is not ready.");
-    return;
-  }
+    if (
+        !window.supabase ||
+        typeof window.supabase.createClient !== "function"
+    ) {
+        console.warn("Supabase library not ready.");
+        return;
+    }
 
-  try {
+    try {
 
-    supabaseClient =
-      window.supabase.createClient(
-        cfg.SUPABASE_URL,
-        cfg.SUPABASE_ANON_KEY
-      );
+        supabaseClient = window.supabase.createClient(
+            cfg.SUPABASE_URL,
+            cfg.SUPABASE_ANON_KEY
+        );
 
-    console.log("Rise From Broken: Supabase connected.");
+        console.log(
+            "Rise From Broken: Supabase connected."
+        );
 
-  } catch (error) {
+    } catch (error) {
 
-    console.warn(
-      "Supabase initialization failed:",
-      error
-    );
+        console.error(
+            "Supabase initialization error:",
+            error
+        );
 
-    supabaseClient = null;
-  }
+        supabaseClient = null;
+    }
 }
 
 
-/*
-  Because the HTML loads the Supabase CDN with defer,
-  wait briefly for it before initializing.
-*/
+/* Wait for Supabase CDN */
 
-if (window.supabase) {
+(function waitForSupabase() {
 
-  initSupabase();
+    let attempts = 0;
 
-} else {
+    const timer = setInterval(() => {
 
-  let attempts = 0;
+        attempts++;
 
-  const supabaseTimer =
-    setInterval(() => {
+        if (window.supabase) {
 
-      attempts++;
+            clearInterval(timer);
+            initSupabase();
 
-      if (window.supabase) {
+        }
 
-        clearInterval(supabaseTimer);
+        if (attempts >= 50) {
 
-        initSupabase();
+            clearInterval(timer);
 
-      }
-
-      if (attempts >= 50) {
-
-        clearInterval(supabaseTimer);
-
-        console.warn(
-          "Supabase library could not be loaded."
-        );
-      }
+            if (!supabaseClient) {
+                console.warn(
+                    "Supabase library was not loaded."
+                );
+            }
+        }
 
     }, 100);
 
-}
+})();
 
 
 /* =========================================================
-   DEMO DATABASE
-   Only used when Supabase is unavailable.
-   Strict matching prevents wrong results.
+   DEMO DATA
 ========================================================= */
 
 const demoResults = [
 
-  {
-    title: "Python Programming",
-    url: "https://www.python.org/",
-    description:
-      "Python is a programming language used for software development, automation, data science and artificial intelligence.",
-    keywords:
-      "python programming coding developer language software ai"
-  },
+    {
+        title: "Python",
+        url: "https://www.python.org/",
+        description:
+            "Python is a powerful programming language used for software development, automation, data science and artificial intelligence.",
+        keywords:
+            "python programming coding software developer language ai"
+    },
 
-  {
-    title: "JavaScript",
-    url:
-      "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
-    description:
-      "JavaScript is a programming language widely used for interactive websites and applications.",
-    keywords:
-      "javascript js programming web frontend coding"
-  },
+    {
+        title: "JavaScript",
+        url:
+            "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+        description:
+            "JavaScript is a programming language widely used for interactive websites and applications.",
+        keywords:
+            "javascript js programming web frontend coding"
+    },
 
-  {
-    title: "HTML",
-    url:
-      "https://developer.mozilla.org/en-US/docs/Web/HTML",
-    description:
-      "HTML is the standard markup language used to structure websites.",
-    keywords:
-      "html website web markup frontend"
-  },
+    {
+        title: "HTML",
+        url:
+            "https://developer.mozilla.org/en-US/docs/Web/HTML",
+        description:
+            "HTML is the standard markup language used to create and structure web pages.",
+        keywords:
+            "html website web markup frontend"
+    },
 
-  {
-    title: "CSS",
-    url:
-      "https://developer.mozilla.org/en-US/docs/Web/CSS",
-    description:
-      "CSS is used to style websites, layouts, colors, fonts and animations.",
-    keywords:
-      "css style styling design website frontend"
-  },
+    {
+        title: "CSS",
+        url:
+            "https://developer.mozilla.org/en-US/docs/Web/CSS",
+        description:
+            "CSS is used to style websites, layouts, colors, fonts and animations.",
+        keywords:
+            "css style styling design website frontend"
+    },
 
-  {
-    title: "React",
-    url: "https://react.dev/",
-    description:
-      "React is a JavaScript library for building user interfaces.",
-    keywords:
-      "react javascript frontend ui web development"
-  },
+    {
+        title: "React",
+        url: "https://react.dev/",
+        description:
+            "React is a JavaScript library for building user interfaces.",
+        keywords:
+            "react javascript frontend ui web development"
+    },
 
-  {
-    title: "Node.js",
-    url: "https://nodejs.org/",
-    description:
-      "Node.js is a JavaScript runtime used to build scalable applications and servers.",
-    keywords:
-      "node nodejs javascript backend server programming"
-  },
+    {
+        title: "Node.js",
+        url: "https://nodejs.org/",
+        description:
+            "Node.js is a JavaScript runtime used to build scalable applications and servers.",
+        keywords:
+            "node nodejs javascript backend server programming"
+    },
 
-  {
-    title: "GitHub",
-    url: "https://github.com/",
-    description:
-      "GitHub is a platform for hosting and collaborating on software projects.",
-    keywords:
-      "github git code programming repository developer"
-  },
+    {
+        title: "GitHub",
+        url: "https://github.com/",
+        description:
+            "GitHub is a platform for hosting and collaborating on software projects.",
+        keywords:
+            "github git code programming repository developer"
+    },
 
-  {
-    title: "Supabase",
-    url: "https://supabase.com/",
-    description:
-      "Supabase is an open source backend platform with PostgreSQL, authentication and APIs.",
-    keywords:
-      "supabase database postgres backend api authentication"
-  },
+    {
+        title: "Supabase",
+        url: "https://supabase.com/",
+        description:
+            "Supabase is an open source backend platform powered by PostgreSQL.",
+        keywords:
+            "supabase database postgres backend api"
+    },
 
-  {
-    title: "Google",
-    url: "https://www.google.com/",
-    description:
-      "Google provides search, cloud computing, software and technology services.",
-    keywords:
-      "google search technology android cloud"
-  },
+    {
+        title: "Google",
+        url: "https://www.google.com/",
+        description:
+            "Google provides search, cloud computing, software and technology services.",
+        keywords:
+            "google search technology android cloud"
+    },
 
-  {
-    title: "YouTube",
-    url: "https://www.youtube.com/",
-    description:
-      "YouTube is an online video platform for watching, uploading and sharing videos.",
-    keywords:
-      "youtube video creator entertainment"
-  },
+    {
+        title: "YouTube",
+        url: "https://www.youtube.com/",
+        description:
+            "YouTube is an online video platform for watching, uploading and sharing videos.",
+        keywords:
+            "youtube video videos creator entertainment"
+    },
 
-  {
-    title: "Wikipedia",
-    url: "https://www.wikipedia.org/",
-    description:
-      "Wikipedia is a free online encyclopedia covering millions of topics.",
-    keywords:
-      "wikipedia encyclopedia information education"
-  },
+    {
+        title: "Wikipedia",
+        url: "https://www.wikipedia.org/",
+        description:
+            "Wikipedia is a free online encyclopedia covering millions of topics.",
+        keywords:
+            "wikipedia encyclopedia information education"
+    },
 
-  {
-    title: "বাংলাদেশ",
-    url:
-      "https://bn.wikipedia.org/wiki/বাংলাদেশ",
-    description:
-      "বাংলাদেশ দক্ষিণ এশিয়ার একটি দেশ। এর রাজধানী ঢাকা।",
-    keywords:
-      "বাংলাদেশ bangladesh bangla desh country"
-  },
+    {
+        title: "বাংলাদেশ",
+        url:
+            "https://bn.wikipedia.org/wiki/বাংলাদেশ",
+        description:
+            "বাংলাদেশ দক্ষিণ এশিয়ার একটি দেশ। এর রাজধানী ঢাকা।",
+        keywords:
+            "বাংলাদেশ bangladesh bangla country দেশ ঢাকা"
+    },
 
-  {
-    title: "ঢাকা",
-    url:
-      "https://bn.wikipedia.org/wiki/ঢাকা",
-    description:
-      "ঢাকা বাংলাদেশের রাজধানী এবং অন্যতম প্রধান শহর।",
-    keywords:
-      "ঢাকা dhaka bangladesh capital city"
-  }
+    {
+        title: "ঢাকা",
+        url:
+            "https://bn.wikipedia.org/wiki/ঢাকা",
+        description:
+            "ঢাকা বাংলাদেশের রাজধানী এবং অন্যতম প্রধান শহর।",
+        keywords:
+            "ঢাকা dhaka bangladesh capital city"
+    }
 
 ];
 
 
 /* =========================================================
-   NORMALIZATION
+   TEXT NORMALIZATION
 ========================================================= */
 
 function normalizeText(value) {
 
-  return String(value || "")
-    .normalize("NFKC")
-    .toLocaleLowerCase()
-    .replace(/[\u200B-\u200D\uFEFF]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+    return String(value || "")
+        .normalize("NFKC")
+        .toLocaleLowerCase()
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
 
 }
 
@@ -299,87 +276,68 @@ function normalizeText(value) {
 
 function tokenize(value) {
 
-  const text =
-    normalizeText(value);
+    const text = normalizeText(value);
 
-  if (!text) return [];
+    if (!text) return [];
 
-  return text
-    .split(
-      /[\s\-_.,!?;:()[\]{}'"\/\\|+=*&^%$#@~`<>]+/
-    )
-    .filter(Boolean);
+    return text
+        .split(/[\s\-_.,!?;:()[\]{}'"\/\\|+=*&^%$#@~`<>]+/)
+        .filter(Boolean);
 
 }
 
 
 /* =========================================================
-   STRICT DEMO SEARCH
+   DEMO SEARCH
 ========================================================= */
 
 function searchDemo(query) {
 
-  const q =
-    normalizeText(query);
+    const words = tokenize(query);
 
-  const queryWords =
-    tokenize(q);
+    if (!words.length) {
+        return [];
+    }
 
-  if (!queryWords.length) {
-    return [];
-  }
+    return demoResults
+        .map(item => {
 
-  return demoResults
-    .map(item => {
+            const titleText =
+                normalizeText(item.title);
 
-      const titleText =
-        normalizeText(item.title);
+            const keywordText =
+                normalizeText(item.keywords);
 
-      const keywordText =
-        normalizeText(item.keywords);
+            const descriptionText =
+                normalizeText(item.description);
 
-      const descriptionText =
-        normalizeText(item.description);
+            let matched = 0;
 
-      let matched = 0;
+            words.forEach(word => {
 
-      for (const word of queryWords) {
+                if (
+                    titleText.includes(word) ||
+                    keywordText.includes(word) ||
+                    descriptionText.includes(word)
+                ) {
+                    matched++;
+                }
 
-        if (
-          titleText === word ||
-          titleText.includes(word) ||
-          keywordText
-            .split(/\s+/)
-            .some(k => k === word) ||
-          descriptionText.includes(word)
-        ) {
-          matched++;
-        }
-      }
+            });
 
-      return {
-        ...item,
-        _matched: matched
-      };
+            return {
+                ...item,
+                _matched: matched
+            };
 
-    })
-    .filter(item => {
-
-      /*
-        IMPORTANT:
-        Every query word must match.
-        This prevents "cat" from returning
-        JavaScript just because of fuzzy similarity.
-      */
-
-      return item._matched === queryWords.length;
-
-    })
-    .sort(
-      (a, b) =>
-        b._matched - a._matched
-    )
-    .slice(0, 20);
+        })
+        .filter(item =>
+            item._matched === words.length
+        )
+        .sort((a, b) =>
+            b._matched - a._matched
+        )
+        .slice(0, 20);
 
 }
 
@@ -390,138 +348,166 @@ function searchDemo(query) {
 
 async function searchSupabase(query) {
 
-  if (!supabaseClient) {
-    return null;
-  }
-
-  try {
-
-    const table =
-      cfg.SEARCH_TABLE ||
-      "search_documents";
-
-    const { data, error } =
-      await supabaseClient
-        .from(table)
-        .select(
-          "title,url,description,keywords"
-        )
-        .or(
-          `title.ilike.%${escapePostgrest(query)}%,description.ilike.%${escapePostgrest(query)}%,keywords.ilike.%${escapePostgrest(query)}%`
-        )
-        .limit(30);
-
-    if (error) {
-
-      console.warn(
-        "Supabase search:",
-        error.message
-      );
-
-      return null;
+    if (!supabaseClient) {
+        return null;
     }
 
-    return Array.isArray(data)
-      ? data
-      : [];
+    try {
 
-  } catch (error) {
+        const table =
+            cfg.SEARCH_TABLE || "search_documents";
 
-    console.warn(
-      "Supabase unavailable:",
-      error
-    );
+        const safeQuery =
+            String(query || "")
+                .replace(/[%_]/g, "\\$&")
+                .replace(/,/g, "\\,")
+                .replace(/\(/g, "\\(")
+                .replace(/\)/g, "\\)");
 
-    return null;
-  }
+        const { data, error } =
+            await supabaseClient
+                .from(table)
+                .select(
+                    "title,url,description,keywords"
+                )
+                .or(
+                    `title.ilike.%${safeQuery}%,description.ilike.%${safeQuery}%,keywords.ilike.%${safeQuery}%`
+                )
+                .limit(30);
 
-}
+        if (error) {
 
+            console.warn(
+                "Supabase search error:",
+                error.message
+            );
 
-/*
-  Basic PostgREST value escaping.
-*/
+            return null;
+        }
 
-function escapePostgrest(value) {
+        return Array.isArray(data)
+            ? data
+            : [];
 
-  return String(value || "")
-    .replace(/[%_]/g, char => `\\${char}`)
-    .replace(/,/g, "\\,")
-    .replace(/\./g, "\\.");
+    } catch (error) {
+
+        console.warn(
+            "Supabase request failed:",
+            error
+        );
+
+        return null;
+    }
 
 }
 
 
 /* =========================================================
-   WIKIPEDIA WEB SEARCH
+   DIRECT URL DETECTION
+========================================================= */
+
+function isUrl(text) {
+
+    try {
+
+        const url =
+            new URL(text);
+
+        return (
+            url.protocol === "http:" ||
+            url.protocol === "https:"
+        );
+
+    } catch {
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   DIRECT URL RESULT
+========================================================= */
+
+function createUrlResult(url) {
+
+    let host = url;
+
+    try {
+        host = new URL(url).hostname;
+    } catch {}
+
+    return [{
+        title: host,
+        url: url,
+        description:
+            "Open this website directly from Rise From Broken."
+    }];
+
+}
+
+
+/* =========================================================
+   WIKIPEDIA SEARCH
 ========================================================= */
 
 async function searchWikipedia(query) {
 
-  try {
+    try {
 
-    const api =
-      "https://en.wikipedia.org/w/api.php" +
-      "?action=query" +
-      "&list=search" +
-      "&srsearch=" +
-      encodeURIComponent(query) +
-      "&format=json" +
-      "&origin=*" +
-      "&srlimit=12";
+        const api =
+            "https://en.wikipedia.org/w/api.php" +
+            "?action=query" +
+            "&list=search" +
+            "&srsearch=" +
+            encodeURIComponent(query) +
+            "&format=json" +
+            "&origin=*" +
+            "&srlimit=15";
 
-    const response =
-      await fetch(api);
+        const response =
+            await fetch(api);
 
-    if (!response.ok) {
-      throw new Error(
-        "Wikipedia request failed"
-      );
+        if (!response.ok) {
+            throw new Error("Wikipedia API failed");
+        }
+
+        const data =
+            await response.json();
+
+        if (
+            !data.query ||
+            !Array.isArray(data.query.search)
+        ) {
+            return [];
+        }
+
+        return data.query.search.map(item => ({
+
+            title: item.title,
+
+            url:
+                "https://en.wikipedia.org/wiki/" +
+                encodeURIComponent(
+                    item.title.replace(/ /g, "_")
+                ),
+
+            description:
+                stripHtml(item.snippet) + "..."
+
+        }));
+
+    } catch (error) {
+
+        console.warn(
+            "Wikipedia error:",
+            error
+        );
+
+        return [];
     }
-
-    const data =
-      await response.json();
-
-    if (
-      !data.query ||
-      !Array.isArray(
-        data.query.search
-      )
-    ) {
-      return [];
-    }
-
-    return data.query.search.map(
-      item => ({
-
-        title: item.title,
-
-        url:
-          "https://en.wikipedia.org/wiki/" +
-          encodeURIComponent(
-            item.title.replace(
-              / /g,
-              "_"
-            )
-          ),
-
-        description:
-          stripHtml(
-            item.snippet
-          ) + "..."
-
-      })
-    );
-
-  } catch (error) {
-
-    console.warn(
-      "Wikipedia:",
-      error
-    );
-
-    return [];
-  }
 
 }
 
@@ -532,99 +518,88 @@ async function searchWikipedia(query) {
 
 async function searchImages(query) {
 
-  try {
+    try {
 
-    const url =
-      "https://commons.wikimedia.org/w/api.php" +
-      "?action=query" +
-      "&generator=search" +
-      "&gsrsearch=" +
-      encodeURIComponent(query) +
-      "&gsrnamespace=6" +
-      "&gsrlimit=20" +
-      "&prop=imageinfo" +
-      "&iiprop=url|mime|extmetadata" +
-      "&iiurlwidth=600" +
-      "&format=json" +
-      "&origin=*";
+        const api =
+            "https://commons.wikimedia.org/w/api.php" +
+            "?action=query" +
+            "&generator=search" +
+            "&gsrsearch=" +
+            encodeURIComponent(query) +
+            "&gsrnamespace=6" +
+            "&gsrlimit=30" +
+            "&prop=imageinfo" +
+            "&iiprop=url|mime" +
+            "&iiurlwidth=600" +
+            "&format=json" +
+            "&origin=*";
 
-    const response =
-      await fetch(url);
+        const response =
+            await fetch(api);
 
-    if (!response.ok) {
-      throw new Error(
-        "Image API failed"
-      );
-    }
-
-    const data =
-      await response.json();
-
-    if (!data.query?.pages) {
-      return [];
-    }
-
-    return Object.values(
-      data.query.pages
-    )
-      .map(page => {
-
-        const info =
-          page.imageinfo?.[0];
-
-        if (!info) return null;
-
-        const mime =
-          String(info.mime || "")
-            .toLowerCase();
-
-        /*
-          Images only.
-        */
-
-        if (
-          mime.startsWith("video/")
-        ) {
-          return null;
+        if (!response.ok) {
+            throw new Error("Wikimedia image API failed");
         }
 
-        return {
+        const data =
+            await response.json();
 
-          title:
-            String(page.title || "")
-              .replace(
-                /^File:/i,
-                ""
-              ),
+        if (!data.query?.pages) {
+            return [];
+        }
 
-          image:
-            info.thumburl ||
-            info.url ||
-            "",
+        return Object.values(data.query.pages)
+            .map(page => {
 
-          url:
-            info.descriptionurl ||
-            info.url ||
-            "#"
+                const info =
+                    page.imageinfo?.[0];
 
-        };
+                if (!info) return null;
 
-      })
-      .filter(
-        item =>
-          item &&
-          item.image
-      );
+                const mime =
+                    String(info.mime || "")
+                        .toLowerCase();
 
-  } catch (error) {
+                if (
+                    !mime.startsWith("image/")
+                ) {
+                    return null;
+                }
 
-    console.warn(
-      "Images:",
-      error
-    );
+                return {
 
-    return [];
-  }
+                    title:
+                        String(page.title || "")
+                            .replace(/^File:/i, ""),
+
+                    image:
+                        info.thumburl ||
+                        info.url ||
+                        "",
+
+                    url:
+                        info.descriptionurl ||
+                        info.url ||
+                        "#"
+
+                };
+
+            })
+            .filter(item =>
+                item &&
+                item.image
+            )
+            .slice(0, 20);
+
+    } catch (error) {
+
+        console.warn(
+            "Image search error:",
+            error
+        );
+
+        return [];
+    }
 
 }
 
@@ -635,100 +610,86 @@ async function searchImages(query) {
 
 async function searchVideos(query) {
 
-  try {
+    try {
 
-    /*
-      Search Wikimedia files normally,
-      then filter the returned files by MIME type.
-    */
+        const api =
+            "https://commons.wikimedia.org/w/api.php" +
+            "?action=query" +
+            "&generator=search" +
+            "&gsrsearch=" +
+            encodeURIComponent(query) +
+            "&gsrnamespace=6" +
+            "&gsrlimit=60" +
+            "&prop=imageinfo" +
+            "&iiprop=url|mime" +
+            "&iiurlwidth=600" +
+            "&format=json" +
+            "&origin=*";
 
-    const url =
-      "https://commons.wikimedia.org/w/api.php" +
-      "?action=query" +
-      "&generator=search" +
-      "&gsrsearch=" +
-      encodeURIComponent(query) +
-      "&gsrnamespace=6" +
-      "&gsrlimit=50" +
-      "&prop=imageinfo" +
-      "&iiprop=url|mime|extmetadata" +
-      "&iiurlwidth=500" +
-      "&format=json" +
-      "&origin=*";
+        const response =
+            await fetch(api);
 
-    const response =
-      await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(
-        "Video API failed"
-      );
-    }
-
-    const data =
-      await response.json();
-
-    if (!data.query?.pages) {
-      return [];
-    }
-
-    return Object.values(
-      data.query.pages
-    )
-      .map(page => {
-
-        const info =
-          page.imageinfo?.[0];
-
-        if (!info) return null;
-
-        const mime =
-          String(info.mime || "")
-            .toLowerCase();
-
-        if (
-          !mime.startsWith("video/")
-        ) {
-          return null;
+        if (!response.ok) {
+            throw new Error("Wikimedia video API failed");
         }
 
-        return {
+        const data =
+            await response.json();
 
-          title:
-            String(page.title || "")
-              .replace(
-                /^File:/i,
-                ""
-              ),
+        if (!data.query?.pages) {
+            return [];
+        }
 
-          thumbnail:
-            info.thumburl ||
-            "",
+        return Object.values(data.query.pages)
+            .map(page => {
 
-          url:
-            info.descriptionurl ||
-            info.url ||
-            "#",
+                const info =
+                    page.imageinfo?.[0];
 
-          videoUrl:
-            info.url ||
-            ""
+                if (!info) return null;
 
-        };
+                const mime =
+                    String(info.mime || "")
+                        .toLowerCase();
 
-      })
-      .filter(Boolean)
-      .slice(0, 20);
+                if (
+                    !mime.startsWith("video/")
+                ) {
+                    return null;
+                }
 
-  } catch (error) {
+                return {
 
-    console.warn(
-      "Videos:",
-      error
-    );
+                    title:
+                        String(page.title || "")
+                            .replace(/^File:/i, ""),
 
-    return [];
-  }
+                    thumbnail:
+                        info.thumburl || "",
+
+                    url:
+                        info.descriptionurl ||
+                        info.url ||
+                        "#",
+
+                    videoUrl:
+                        info.url || ""
+
+                };
+
+            })
+            .filter(Boolean)
+            .slice(0, 20);
+
+    } catch (error) {
+
+        console.warn(
+            "Video search error:",
+            error
+        );
+
+        return [];
+    }
 
 }
 
@@ -739,147 +700,132 @@ async function searchVideos(query) {
 
 async function searchNews(query) {
 
-  try {
+    try {
 
-    const rss =
-      "https://news.google.com/rss/search?q=" +
-      encodeURIComponent(query) +
-      "&hl=en-US&gl=US&ceid=US:en";
+        const rss =
+            "https://news.google.com/rss/search?q=" +
+            encodeURIComponent(query) +
+            "&hl=en-US&gl=US&ceid=US:en";
 
-    const proxy =
-      "https://api.allorigins.win/raw?url=" +
-      encodeURIComponent(rss);
+        const proxy =
+            "https://api.allorigins.win/raw?url=" +
+            encodeURIComponent(rss);
 
-    const response =
-      await fetch(proxy);
+        const response =
+            await fetch(proxy);
 
-    if (!response.ok) {
-      throw new Error(
-        "News request failed"
-      );
+        if (!response.ok) {
+            throw new Error("News API failed");
+        }
+
+        const text =
+            await response.text();
+
+        const parser =
+            new DOMParser();
+
+        const xml =
+            parser.parseFromString(
+                text,
+                "text/xml"
+            );
+
+        return [
+            ...xml.querySelectorAll("item")
+        ]
+            .slice(0, 20)
+            .map(item => ({
+
+                title:
+                    item.querySelector("title")
+                        ?.textContent || "",
+
+                url:
+                    item.querySelector("link")
+                        ?.textContent || "#",
+
+                description:
+                    item.querySelector("description")
+                        ?.textContent || "",
+
+                source:
+                    item.querySelector("source")
+                        ?.textContent || "News"
+
+            }));
+
+    } catch (error) {
+
+        console.warn(
+            "News search error:",
+            error
+        );
+
+        return [];
     }
-
-    const text =
-      await response.text();
-
-    const parser =
-      new DOMParser();
-
-    const xml =
-      parser.parseFromString(
-        text,
-        "text/xml"
-      );
-
-    return [
-      ...xml.querySelectorAll("item")
-    ]
-      .slice(0, 15)
-      .map(item => ({
-
-        title:
-          item.querySelector(
-            "title"
-          )?.textContent || "",
-
-        url:
-          item.querySelector(
-            "link"
-          )?.textContent || "#",
-
-        description:
-          item.querySelector(
-            "description"
-          )?.textContent || "",
-
-        source:
-          item.querySelector(
-            "source"
-          )?.textContent ||
-          "News"
-
-      }));
-
-  } catch (error) {
-
-    console.warn(
-      "News:",
-      error
-    );
-
-    return [];
-  }
 
 }
 
 
 /* =========================================================
-   RENDER WEB
+   RENDER WEB RESULTS
 ========================================================= */
 
 function renderWebResults(data) {
 
-  results.innerHTML = "";
+    results.innerHTML = "";
 
-  count.textContent =
-    `${data.length} result${
-      data.length === 1
-        ? ""
-        : "s"
-    }`;
+    count.textContent =
+        `${data.length} result${data.length === 1 ? "" : "s"}`;
 
-  emptyState.hidden = true;
+    if (!data.length) {
 
-  if (!data.length) {
+        renderEmpty(
+            "No results found."
+        );
 
-    renderMediaEmpty(
-      "No results found."
-    );
+        return;
+    }
 
-    return;
-  }
+    emptyState.hidden = true;
 
-  data.forEach(item => {
+    data.forEach(item => {
 
-    const card =
-      document.createElement("a");
+        const card =
+            document.createElement("a");
 
-    card.className =
-      "result";
+        card.className = "result";
 
-    card.href =
-      item.url || "#";
+        card.href =
+            item.url || "#";
 
-    card.target = "_blank";
+        card.target = "_blank";
 
-    card.rel =
-      "noopener noreferrer";
+        card.rel =
+            "noopener noreferrer";
 
-    card.innerHTML = `
+        card.innerHTML = `
 
-      <div class="result-url">
-        ${escapeHtml(item.url || "")}
-      </div>
+            <div class="result-url">
+                ${escapeHtml(item.url || "")}
+            </div>
 
-      <h3>
-        ${escapeHtml(
-          item.title ||
-          "Untitled"
-        )}
-      </h3>
+            <h3>
+                ${escapeHtml(item.title || "Untitled")}
+            </h3>
 
-      <p>
-        ${escapeHtml(
-          item.description ||
-          "No description available."
-        )}
-      </p>
+            <p>
+                ${escapeHtml(
+                    item.description ||
+                    "No description available."
+                )}
+            </p>
 
-    `;
+        `;
 
-    results.appendChild(card);
+        results.appendChild(card);
 
-  });
+    });
 
 }
 
@@ -890,77 +836,67 @@ function renderWebResults(data) {
 
 function renderImages(data) {
 
-  results.innerHTML = "";
+    results.innerHTML = "";
 
-  count.textContent =
-    `${data.length} image${
-      data.length === 1
-        ? ""
-        : "s"
-    }`;
+    count.textContent =
+        `${data.length} image${data.length === 1 ? "" : "s"}`;
 
-  emptyState.hidden = true;
+    if (!data.length) {
 
-  if (!data.length) {
+        renderEmpty(
+            "No images found."
+        );
 
-    renderMediaEmpty(
-      "No images found."
-    );
+        return;
+    }
 
-    return;
-  }
+    emptyState.hidden = true;
 
-  const grid =
-    document.createElement("div");
+    const grid =
+        document.createElement("div");
 
-  grid.className =
-    "images-grid";
+    grid.className =
+        "images-grid";
 
-  data.forEach(item => {
+    data.forEach(item => {
 
-    const card =
-      document.createElement("a");
+        const card =
+            document.createElement("a");
 
-    card.className =
-      "image-card";
+        card.className =
+            "image-card";
 
-    card.href =
-      item.url || "#";
+        card.href =
+            item.url || "#";
 
-    card.target = "_blank";
+        card.target = "_blank";
 
-    card.rel =
-      "noopener noreferrer";
+        card.rel =
+            "noopener noreferrer";
 
-    card.innerHTML = `
+        card.innerHTML = `
 
-      <img
-        src="${escapeHtml(
-          item.image
-        )}"
-        alt="${escapeHtml(
-          item.title
-        )}"
-        loading="lazy"
-      >
+            <img
+                src="${escapeHtml(item.image)}"
+                alt="${escapeHtml(item.title)}"
+                loading="lazy"
+                onerror="this.style.display='none'"
+            >
 
-      <div class="image-card-content">
+            <div class="image-card-content">
 
-        <div class="image-card-title">
-          ${escapeHtml(
-            item.title
-          )}
-        </div>
+                <div class="image-card-title">
+                    ${escapeHtml(item.title)}
+                </div>
 
-      </div>
+            </div>
+        `;
 
-    `;
+        grid.appendChild(card);
 
-    grid.appendChild(card);
+    });
 
-  });
-
-  results.appendChild(grid);
+    results.appendChild(grid);
 
 }
 
@@ -971,95 +907,86 @@ function renderImages(data) {
 
 function renderVideos(data) {
 
-  results.innerHTML = "";
+    results.innerHTML = "";
 
-  count.textContent =
-    `${data.length} video${
-      data.length === 1
-        ? ""
-        : "s"
-    }`;
+    count.textContent =
+        `${data.length} video${data.length === 1 ? "" : "s"}`;
 
-  emptyState.hidden = true;
+    if (!data.length) {
 
-  if (!data.length) {
+        renderEmpty(
+            "No videos found."
+        );
 
-    renderMediaEmpty(
-      "No videos found."
-    );
+        return;
+    }
 
-    return;
-  }
+    emptyState.hidden = true;
 
-  const grid =
-    document.createElement("div");
+    const grid =
+        document.createElement("div");
 
-  grid.className =
-    "videos-grid";
+    grid.className =
+        "videos-grid";
 
-  data.forEach(item => {
+    data.forEach(item => {
 
-    const card =
-      document.createElement("a");
+        const card =
+            document.createElement("a");
 
-    card.className =
-      "video-card";
+        card.className =
+            "video-card";
 
-    card.href =
-      item.url || "#";
+        card.href =
+            item.url || "#";
 
-    card.target = "_blank";
+        card.target = "_blank";
 
-    card.rel =
-      "noopener noreferrer";
+        card.rel =
+            "noopener noreferrer";
 
-    card.innerHTML = `
+        card.innerHTML = `
 
-      <div class="video-thumbnail">
+            <div class="video-thumbnail">
 
-        ${
-          item.thumbnail
-            ? `
-              <img
-                src="${escapeHtml(
-                  item.thumbnail
-                )}"
-                alt="${escapeHtml(
-                  item.title
-                )}"
-                loading="lazy"
-              >
-            `
-            : `
-              <div class="video-placeholder">
-                🎬
-              </div>
-            `
-        }
+                ${
+                    item.thumbnail
+                    ?
+                    `
+                    <img
+                        src="${escapeHtml(item.thumbnail)}"
+                        alt="${escapeHtml(item.title)}"
+                        loading="lazy"
+                    >
+                    `
+                    :
+                    `
+                    <div class="video-placeholder">
+                        🎬
+                    </div>
+                    `
+                }
 
-        <div class="video-play">
-          ▶
-        </div>
+                <div class="video-play">
+                    ▶
+                </div>
 
-      </div>
+            </div>
 
-      <div class="video-card-content">
+            <div class="video-card-content">
 
-        <div class="video-card-title">
-          ${escapeHtml(
-            item.title
-          )}
-        </div>
+                <div class="video-card-title">
+                    ${escapeHtml(item.title)}
+                </div>
 
-      </div>
+            </div>
+        `;
 
-    `;
+        grid.appendChild(card);
 
-    grid.appendChild(card);
+    });
 
-  });
-
-  results.appendChild(grid);
+    results.appendChild(grid);
 
 }
 
@@ -1070,109 +997,101 @@ function renderVideos(data) {
 
 function renderNews(data) {
 
-  results.innerHTML = "";
+    results.innerHTML = "";
 
-  count.textContent =
-    `${data.length} news result${
-      data.length === 1
-        ? ""
-        : "s"
-    }`;
+    count.textContent =
+        `${data.length} news result${data.length === 1 ? "" : "s"}`;
 
-  emptyState.hidden = true;
+    if (!data.length) {
 
-  if (!data.length) {
+        renderEmpty(
+            "No news found."
+        );
 
-    renderMediaEmpty(
-      "No news found."
-    );
+        return;
+    }
 
-    return;
-  }
+    emptyState.hidden = true;
 
-  const list =
-    document.createElement("div");
+    const list =
+        document.createElement("div");
 
-  list.className =
-    "news-list";
+    list.className =
+        "news-list";
 
-  data.forEach(item => {
+    data.forEach(item => {
 
-    const card =
-      document.createElement("a");
+        const card =
+            document.createElement("a");
 
-    card.className =
-      "news-card";
+        card.className =
+            "news-card";
 
-    card.href =
-      item.url || "#";
+        card.href =
+            item.url || "#";
 
-    card.target = "_blank";
+        card.target = "_blank";
 
-    card.rel =
-      "noopener noreferrer";
+        card.rel =
+            "noopener noreferrer";
 
-    card.innerHTML = `
+        card.innerHTML = `
 
-      <div class="news-content">
+            <div class="news-content">
 
-        <div class="news-source">
-          ${escapeHtml(
-            item.source ||
-            "News"
-          )}
-        </div>
+                <div class="news-source">
+                    ${escapeHtml(item.source || "News")}
+                </div>
 
-        <div class="news-title">
-          ${escapeHtml(
-            item.title
-          )}
-        </div>
+                <div class="news-title">
+                    ${escapeHtml(item.title || "Untitled")}
+                </div>
 
-        <div class="news-description">
-          ${escapeHtml(
-            stripHtml(
-              item.description
-            )
-          )}
-        </div>
+                <div class="news-description">
+                    ${escapeHtml(
+                        stripHtml(item.description)
+                    )}
+                </div>
 
-      </div>
+            </div>
+        `;
 
-    `;
+        list.appendChild(card);
 
-    list.appendChild(card);
+    });
 
-  });
-
-  results.appendChild(list);
+    results.appendChild(list);
 
 }
 
 
 /* =========================================================
-   EMPTY STATE
+   EMPTY
 ========================================================= */
 
-function renderMediaEmpty(message) {
+function renderEmpty(message) {
 
-  emptyState.innerHTML = `
+    results.innerHTML = "";
 
-    <div class="empty-mark">
-      ⌕
-    </div>
+    emptyState.innerHTML = `
 
-    <h3>
-      ${escapeHtml(message)}
-    </h3>
+        <div class="empty-mark">
+            ⌕
+        </div>
 
-    <p>
-      Try another search.
-    </p>
+        <h3>
+            ${escapeHtml(message)}
+        </h3>
 
-  `;
+        <p>
+            Try another search.
+        </p>
 
-  emptyState.hidden = false;
+    `;
+
+    emptyState.hidden = false;
+
+    count.textContent = "0 results";
 
 }
 
@@ -1182,199 +1101,217 @@ function renderMediaEmpty(message) {
 ========================================================= */
 
 async function runSearch(
-  query,
-  tab = currentTab
+    query,
+    tab = currentTab
 ) {
 
-  query =
-    String(query || "").trim();
+    query =
+        String(query || "").trim();
 
-  if (!query) {
-    return;
-  }
-
-  currentQuery = query;
-  currentTab = tab;
-
-  resultsSection.hidden = false;
-  emptyState.hidden = true;
-
-  title.textContent = query;
-
-  count.textContent =
-    "Searching...";
-
-  results.innerHTML = "";
-
-  if (loadingState) {
-    loadingState.hidden = false;
-  }
-
-  historyPush(query);
-
-  try {
-
-    /* =========================
-       IMAGES
-    ========================= */
-
-    if (tab === "images") {
-
-      const data =
-        await searchImages(query);
-
-      renderImages(data);
-
+    if (!query) {
+        return;
     }
 
-    /* =========================
-       VIDEOS
-    ========================= */
+    currentQuery = query;
+    currentTab = tab;
 
-    else if (tab === "videos") {
+    resultsSection.hidden = false;
+    emptyState.hidden = true;
 
-      const data =
-        await searchVideos(query);
+    title.textContent = query;
+    count.textContent = "Searching...";
 
-      renderVideos(data);
-
-    }
-
-    /* =========================
-       NEWS
-    ========================= */
-
-    else if (tab === "news") {
-
-      const data =
-        await searchNews(query);
-
-      renderNews(data);
-
-    }
-
-    /* =========================
-       ALL / WEB
-    ========================= */
-
-    else {
-
-      let data = null;
-
-      /*
-        First: Supabase
-      */
-
-      data =
-        await searchSupabase(query);
-
-      /*
-        Second: demo database
-        ONLY if Supabase is unavailable.
-      */
-
-      if (data === null) {
-
-        data =
-          searchDemo(query);
-      }
-
-      /*
-        Third: Wikipedia
-        Only if there are no results.
-      */
-
-      if (
-        Array.isArray(data) &&
-        data.length === 0
-      ) {
-
-        data =
-          await searchWikipedia(query);
-      }
-
-      renderWebResults(
-        data || []
-      );
-
-    }
-
-  } catch (error) {
-
-    console.error(
-      "Search error:",
-      error
-    );
-
-    renderMediaEmpty(
-      "Search failed."
-    );
-
-  } finally {
+    results.innerHTML = "";
 
     if (loadingState) {
-      loadingState.hidden = true;
+        loadingState.hidden = false;
     }
 
-  }
+    historyPush(query);
 
-  resultsSection.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
+    try {
+
+        /* =================================================
+           DIRECT URL
+        ================================================= */
+
+        if (
+            tab === "all" &&
+            isUrl(query)
+        ) {
+
+            renderWebResults(
+                createUrlResult(query)
+            );
+
+            return;
+        }
+
+
+        /* =================================================
+           IMAGES
+        ================================================= */
+
+        if (tab === "images") {
+
+            const data =
+                await searchImages(query);
+
+            renderImages(data);
+
+            return;
+        }
+
+
+        /* =================================================
+           VIDEOS
+        ================================================= */
+
+        if (tab === "videos") {
+
+            const data =
+                await searchVideos(query);
+
+            renderVideos(data);
+
+            return;
+        }
+
+
+        /* =================================================
+           NEWS
+        ================================================= */
+
+        if (tab === "news") {
+
+            const data =
+                await searchNews(query);
+
+            renderNews(data);
+
+            return;
+        }
+
+
+        /* =================================================
+           ALL / WEB
+        ================================================= */
+
+        let data =
+            await searchSupabase(query);
+
+
+        /* Supabase unavailable */
+
+        if (data === null) {
+
+            data =
+                searchDemo(query);
+
+        }
+
+
+        /* If Supabase has no matching result */
+
+        if (
+            Array.isArray(data) &&
+            data.length === 0
+        ) {
+
+            data =
+                searchDemo(query);
+
+        }
+
+
+        /* Wikipedia fallback */
+
+        if (
+            Array.isArray(data) &&
+            data.length === 0
+        ) {
+
+            data =
+                await searchWikipedia(query);
+
+        }
+
+
+        renderWebResults(
+            data || []
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Search error:",
+            error
+        );
+
+        renderEmpty(
+            "Search failed. Please try again."
+        );
+
+    } finally {
+
+        if (loadingState) {
+            loadingState.hidden = true;
+        }
+
+    }
+
+    resultsSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 
 }
 
 
 /* =========================================================
-   TAB SYSTEM
+   TABS
 ========================================================= */
 
 tabs.forEach(tab => {
 
-  tab.addEventListener(
-    "click",
-    () => {
+    tab.addEventListener(
+        "click",
+        () => {
 
-      tabs.forEach(t => {
+            tabs.forEach(t => {
 
-        t.classList.remove(
-          "active"
-        );
+                t.classList.remove("active");
 
-        t.setAttribute(
-          "aria-selected",
-          "false"
-        );
+                t.setAttribute(
+                    "aria-selected",
+                    "false"
+                );
 
-      });
+            });
 
-      tab.classList.add(
-        "active"
-      );
+            tab.classList.add("active");
 
-      tab.setAttribute(
-        "aria-selected",
-        "true"
-      );
+            tab.setAttribute(
+                "aria-selected",
+                "true"
+            );
 
-      const mode =
-        tab.dataset.tab ||
-        "all";
+            const mode =
+                tab.dataset.tab || "all";
 
-      currentTab = mode;
+            currentTab = mode;
 
-      if (currentQuery) {
+            if (currentQuery) {
 
-        runSearch(
-          currentQuery,
-          mode
-        );
+                runSearch(
+                    currentQuery,
+                    mode
+                );
 
-      }
+            }
 
-    }
-  );
+        }
+    );
 
 });
 
@@ -1385,55 +1322,55 @@ tabs.forEach(tab => {
 
 if (form) {
 
-  form.addEventListener(
-    "submit",
-    event => {
+    form.addEventListener(
+        "submit",
+        event => {
 
-      event.preventDefault();
+            event.preventDefault();
 
-      runSearch(
-        input.value,
-        currentTab
-      );
+            runSearch(
+                input.value,
+                currentTab
+            );
 
-    }
-  );
+        }
+    );
 
 }
 
 
 /* =========================================================
-   CLEAR BUTTON
+   CLEAR
 ========================================================= */
 
 if (input && clearBtn) {
 
-  input.addEventListener(
-    "input",
-    () => {
+    input.addEventListener(
+        "input",
+        () => {
 
-      clearBtn.hidden =
-        !input.value.trim();
+            clearBtn.hidden =
+                !input.value.trim();
 
-    }
-  );
+        }
+    );
 
-  clearBtn.addEventListener(
-    "click",
-    () => {
+    clearBtn.addEventListener(
+        "click",
+        () => {
 
-      input.value = "";
+            input.value = "";
 
-      clearBtn.hidden = true;
+            clearBtn.hidden = true;
 
-      input.focus();
+            input.focus();
 
-      if (suggestions) {
-        suggestions.hidden = true;
-      }
+            if (suggestions) {
+                suggestions.hidden = true;
+            }
 
-    }
-  );
+        }
+    );
 
 }
 
@@ -1443,52 +1380,49 @@ if (input && clearBtn) {
 ========================================================= */
 
 document
-  .querySelectorAll(".quick")
-  .forEach(button => {
+    .querySelectorAll(".quick")
+    .forEach(button => {
 
-    button.addEventListener(
-      "click",
-      () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-        input.value =
-          button.dataset.q ||
-          button.textContent.trim();
+                input.value =
+                    button.dataset.q ||
+                    button.textContent.trim();
 
-        if (clearBtn) {
-          clearBtn.hidden = false;
-        }
+                if (clearBtn) {
+                    clearBtn.hidden = false;
+                }
 
-        if (suggestions) {
-          suggestions.hidden = true;
-        }
+                currentTab = "all";
 
-        currentTab = "all";
+                tabs.forEach(tab => {
 
-        tabs.forEach(tab => {
+                    const active =
+                        tab.dataset.tab === "all";
 
-          tab.classList.toggle(
-            "active",
-            tab.dataset.tab === "all"
-          );
+                    tab.classList.toggle(
+                        "active",
+                        active
+                    );
 
-          tab.setAttribute(
-            "aria-selected",
-            tab.dataset.tab === "all"
-              ? "true"
-              : "false"
-          );
+                    tab.setAttribute(
+                        "aria-selected",
+                        active ? "true" : "false"
+                    );
 
-        });
+                });
 
-        runSearch(
-          input.value,
-          "all"
+                runSearch(
+                    input.value,
+                    "all"
+                );
+
+            }
         );
 
-      }
-    );
-
-  });
+    });
 
 
 /* =========================================================
@@ -1497,99 +1431,97 @@ document
 
 if (input && suggestions) {
 
-  input.addEventListener(
-    "input",
-    () => {
+    input.addEventListener(
+        "input",
+        () => {
 
-      const query =
-        normalizeText(
-          input.value
-        );
+            const query =
+                normalizeText(input.value);
 
-      if (!query) {
+            if (!query) {
 
-        suggestions.hidden = true;
+                suggestions.hidden = true;
 
-        return;
-      }
-
-      const history =
-        JSON.parse(
-          localStorage.getItem(
-            "rise-from-broken_history"
-          ) || "[]"
-        );
-
-      const demoTitles =
-        demoResults.map(
-          item => item.title
-        );
-
-      const allSuggestions = [
-        ...history,
-        ...demoTitles
-      ];
-
-      const unique =
-        [
-          ...new Set(
-            allSuggestions
-          )
-        ];
-
-      const matched =
-        unique
-          .filter(item =>
-            normalizeText(item)
-              .includes(query)
-          )
-          .slice(0, 7);
-
-      suggestions.innerHTML =
-        matched
-          .map(
-            item => `
-
-              <button
-                type="button"
-                class="suggestion"
-              >
-                ${escapeHtml(item)}
-              </button>
-
-            `
-          )
-          .join("");
-
-      suggestions.hidden =
-        !matched.length;
-
-      suggestions
-        .querySelectorAll("button")
-        .forEach(button => {
-
-          button.onclick = () => {
-
-            input.value =
-              button.textContent.trim();
-
-            suggestions.hidden = true;
-
-            if (clearBtn) {
-              clearBtn.hidden = false;
+                return;
             }
 
-            runSearch(
-              input.value,
-              currentTab
-            );
+            let history = [];
 
-          };
+            try {
 
-        });
+                history =
+                    JSON.parse(
+                        localStorage.getItem(
+                            "rise-from-broken_history"
+                        ) || "[]"
+                    );
 
-    }
-  );
+            } catch {}
+
+            const demoTitles =
+                demoResults.map(
+                    item => item.title
+                );
+
+            const unique =
+                [
+                    ...new Set([
+                        ...history,
+                        ...demoTitles
+                    ])
+                ];
+
+            const matched =
+                unique
+                    .filter(item =>
+                        normalizeText(item)
+                            .includes(query)
+                    )
+                    .slice(0, 7);
+
+            suggestions.innerHTML =
+                matched
+                    .map(item => `
+
+                        <button
+                            type="button"
+                            class="suggestion"
+                        >
+                            ${escapeHtml(item)}
+                        </button>
+
+                    `)
+                    .join("");
+
+            suggestions.hidden =
+                !matched.length;
+
+            suggestions
+                .querySelectorAll("button")
+                .forEach(button => {
+
+                    button.onclick = () => {
+
+                        input.value =
+                            button.textContent.trim();
+
+                        suggestions.hidden = true;
+
+                        if (clearBtn) {
+                            clearBtn.hidden = false;
+                        }
+
+                        runSearch(
+                            input.value,
+                            currentTab
+                        );
+
+                    };
+
+                });
+
+        }
+    );
 
 }
 
@@ -1599,25 +1531,21 @@ if (input && suggestions) {
 ========================================================= */
 
 document.addEventListener(
-  "click",
-  event => {
+    "click",
+    event => {
 
-    if (
-      !event.target.closest(
-        ".search-box"
-      ) &&
-      !event.target.closest(
-        ".suggestions"
-      )
-    ) {
+        if (
+            !event.target.closest(".search-box") &&
+            !event.target.closest(".suggestions")
+        ) {
 
-      if (suggestions) {
-        suggestions.hidden = true;
-      }
+            if (suggestions) {
+                suggestions.hidden = true;
+            }
+
+        }
 
     }
-
-  }
 );
 
 
@@ -1627,68 +1555,64 @@ document.addEventListener(
 
 if (voiceBtn) {
 
-  voiceBtn.addEventListener(
-    "click",
-    () => {
+    voiceBtn.addEventListener(
+        "click",
+        () => {
 
-      const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
+            const SpeechRecognition =
+                window.SpeechRecognition ||
+                window.webkitSpeechRecognition;
 
-      if (!SpeechRecognition) {
+            if (!SpeechRecognition) {
 
-        alert(
-          "Voice search is not supported in this browser."
-        );
+                alert(
+                    "Voice search is not supported in this browser."
+                );
 
-        return;
-      }
+                return;
+            }
 
-      const recognition =
-        new SpeechRecognition();
+            const recognition =
+                new SpeechRecognition();
 
-      recognition.lang =
-        "en-US";
+            recognition.lang = "en-US";
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
 
-      recognition.interimResults =
-        false;
+            recognition.onresult =
+                event => {
 
-      recognition.maxAlternatives =
-        1;
+                    const text =
+                        event.results[0][0]
+                            .transcript;
 
-      recognition.onresult =
-        event => {
+                    input.value = text;
 
-          const text =
-            event.results[0][0].transcript;
+                    if (clearBtn) {
+                        clearBtn.hidden = false;
+                    }
 
-          input.value = text;
+                    runSearch(
+                        text,
+                        currentTab
+                    );
 
-          if (clearBtn) {
-            clearBtn.hidden = false;
-          }
+                };
 
-          runSearch(
-            text,
-            currentTab
-          );
+            recognition.onerror =
+                error => {
 
-        };
+                    console.warn(
+                        "Voice search:",
+                        error
+                    );
 
-      recognition.onerror =
-        error => {
+                };
 
-          console.warn(
-            "Voice search:",
-            error
-          );
+            recognition.start();
 
-        };
-
-      recognition.start();
-
-    }
-  );
+        }
+    );
 
 }
 
@@ -1698,43 +1622,37 @@ if (voiceBtn) {
 ========================================================= */
 
 const themeButton =
-  document.querySelector(
-    "#themeBtn"
-  );
+    document.querySelector("#themeBtn");
 
 if (themeButton) {
 
-  themeButton.addEventListener(
-    "click",
-    () => {
+    themeButton.addEventListener(
+        "click",
+        () => {
 
-      document.body.classList.toggle(
-        "light"
-      );
+            document.body.classList.toggle(
+                "light"
+            );
 
-      localStorage.setItem(
-        "rise-from-broken_theme",
-        document.body.classList.contains(
-          "light"
-        )
-          ? "light"
-          : "dark"
-      );
+            localStorage.setItem(
+                "rise-from-broken_theme",
+                document.body.classList.contains("light")
+                    ? "light"
+                    : "dark"
+            );
 
-    }
-  );
+        }
+    );
 
 }
 
 if (
-  localStorage.getItem(
-    "rise-from-broken_theme"
-  ) === "light"
+    localStorage.getItem(
+        "rise-from-broken_theme"
+    ) === "light"
 ) {
 
-  document.body.classList.add(
-    "light"
-  );
+    document.body.classList.add("light");
 
 }
 
@@ -1745,18 +1663,18 @@ if (
 
 function escapeHtml(value) {
 
-  return String(value || "")
-    .replace(
-      /[&<>"']/g,
-      char =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#039;"
-        })[char]
-    );
+    return String(value || "")
+        .replace(
+            /[&<>"']/g,
+            char =>
+                ({
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#039;"
+                })[char]
+        );
 
 }
 
@@ -1767,68 +1685,68 @@ function escapeHtml(value) {
 
 function stripHtml(value) {
 
-  const div =
-    document.createElement("div");
+    const div =
+        document.createElement("div");
 
-  div.innerHTML =
-    String(value || "");
+    div.innerHTML =
+        String(value || "");
 
-  return (
-    div.textContent ||
-    div.innerText ||
-    ""
-  );
+    return (
+        div.textContent ||
+        div.innerText ||
+        ""
+    );
 
 }
 
 
 /* =========================================================
-   HISTORY
+   SEARCH HISTORY
 ========================================================= */
 
 function historyPush(query) {
 
-  try {
+    try {
 
-    const history =
-      JSON.parse(
-        localStorage.getItem(
-          "rise-from-broken_history"
-        ) || "[]"
-      );
+        const history =
+            JSON.parse(
+                localStorage.getItem(
+                    "rise-from-broken_history"
+                ) || "[]"
+            );
 
-    const cleaned =
-      history.filter(
-        item =>
-          normalizeText(item) !==
-          normalizeText(query)
-      );
+        const cleaned =
+            history.filter(
+                item =>
+                    normalizeText(item) !==
+                    normalizeText(query)
+            );
 
-    cleaned.unshift(query);
+        cleaned.unshift(query);
 
-    localStorage.setItem(
-      "rise-from-broken_history",
-      JSON.stringify(
-        cleaned.slice(0, 10)
-      )
-    );
+        localStorage.setItem(
+            "rise-from-broken_history",
+            JSON.stringify(
+                cleaned.slice(0, 10)
+            )
+        );
 
-  } catch (error) {
+    } catch (error) {
 
-    console.warn(
-      "History error:",
-      error
-    );
+        console.warn(
+            "History error:",
+            error
+        );
 
-  }
+    }
 
 }
 
 
 /* =========================================================
-   STARTUP
+   START
 ========================================================= */
 
 console.log(
-  "Rise From Broken Search Engine loaded."
+    "Rise From Broken Search Engine loaded successfully."
 );
