@@ -1,4 +1,4 @@
-const cfg = window.RISE FROM BROKEN_CONFIG || {};
+const cfg = window.RISE_FROM_BROKEN_CONFIG || {};
 let supabaseClient = null;
 
 if (cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && window.supabase) {
