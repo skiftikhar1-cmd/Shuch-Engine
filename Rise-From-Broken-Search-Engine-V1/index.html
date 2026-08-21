@@ -110,7 +110,10 @@
             autocomplete="off"
           >
 
-            <span class="search-icon">
+            <span
+              class="search-icon"
+              aria-hidden="true"
+            >
               ⌕
             </span>
 
@@ -129,6 +132,7 @@
               class="search-action"
               type="button"
               aria-label="Voice search"
+              title="Voice search"
             >
               🎙
             </button>
@@ -138,6 +142,7 @@
               class="search-action"
               type="button"
               aria-label="Clear search"
+              title="Clear search"
               hidden
             >
               ×
@@ -146,6 +151,7 @@
             <button
               class="search-submit"
               type="submit"
+              aria-label="Search"
             >
               Search
             </button>
@@ -225,6 +231,7 @@
         aria-label="Search categories"
       >
 
+        <!-- ALL -->
         <button
           class="search-tab active"
           type="button"
@@ -235,6 +242,7 @@
           All
         </button>
 
+        <!-- IMAGES -->
         <button
           class="search-tab"
           type="button"
@@ -245,6 +253,7 @@
           Images
         </button>
 
+        <!-- VIDEOS -->
         <button
           class="search-tab"
           type="button"
@@ -255,6 +264,7 @@
           Videos
         </button>
 
+        <!-- NEWS -->
         <button
           class="search-tab"
           type="button"
@@ -298,12 +308,7 @@
       </div>
 
 
-      <!-- =================================================
-           IMPORTANT:
-           app.js uses #results for ALL results,
-           IMAGES, VIDEOS and NEWS.
-           So there must be only one main results container.
-      ================================================== -->
+      <!-- MAIN RESULT CONTAINER -->
 
       <div
         id="results"
@@ -514,7 +519,6 @@
   <!-- ================= CONFIG ================= -->
 
   <script src="config.js"></script>
-
 
   <!-- ================= MAIN APP ================= -->
 
