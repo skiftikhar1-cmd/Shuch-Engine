@@ -24,10 +24,8 @@
   <link rel="stylesheet" href="style.css">
 
   <!-- Supabase -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    defer
-  ></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
 
 <body>
@@ -40,7 +38,6 @@
 
     <div class="header-inner">
 
-      <!-- Logo -->
       <a
         href="#"
         class="brand"
@@ -48,6 +45,7 @@
       >
 
         <div class="brand-logo">
+
           <img
             src="assets/shuch-logo.png"
             alt="Rise From Broken Logo"
@@ -57,6 +55,7 @@
           <span class="brand-fallback">
             RFB
           </span>
+
         </div>
 
         <div class="brand-text">
@@ -66,8 +65,6 @@
 
       </a>
 
-
-      <!-- Header actions -->
       <div class="header-actions">
 
         <button
@@ -94,9 +91,9 @@
   <main class="main-container">
 
 
-    <!-- =================================================
-         HERO / SEARCH
-    ================================================== -->
+    <!-- ===================================================
+         HERO
+    ==================================================== -->
 
     <section class="hero">
 
@@ -120,13 +117,14 @@
           <span>Your way.</span>
         </h1>
 
+
         <p class="hero-description">
           A smart, fast and multilingual search experience
           for the web, images, videos and news.
         </p>
 
 
-        <!-- Search box -->
+        <!-- SEARCH -->
 
         <div class="search-wrapper">
 
@@ -155,7 +153,6 @@
             >
 
 
-            <!-- Voice search UI -->
             <button
               id="voiceBtn"
               class="search-action"
@@ -167,7 +164,6 @@
             </button>
 
 
-            <!-- Clear -->
             <button
               id="clearBtn"
               class="search-action"
@@ -191,7 +187,7 @@
           </form>
 
 
-          <!-- Suggestions -->
+          <!-- SUGGESTIONS -->
 
           <div
             id="suggestions"
@@ -203,7 +199,7 @@
         </div>
 
 
-        <!-- Quick searches -->
+        <!-- QUICK SEARCH -->
 
         <div class="quick-searches">
 
@@ -248,9 +244,9 @@
     </section>
 
 
-    <!-- =================================================
+    <!-- ===================================================
          SEARCH CONTENT
-    ================================================== -->
+    ==================================================== -->
 
     <section
       id="resultsSection"
@@ -259,7 +255,7 @@
     >
 
 
-      <!-- Search navigation -->
+      <!-- SEARCH TABS -->
 
       <nav
         class="search-tabs"
@@ -269,7 +265,7 @@
         <button
           class="search-tab active"
           type="button"
-          data-type="all"
+          data-tab="all"
           aria-selected="true"
         >
           <span>⌕</span>
@@ -280,7 +276,7 @@
         <button
           class="search-tab"
           type="button"
-          data-type="images"
+          data-tab="images"
           aria-selected="false"
         >
           <span>▧</span>
@@ -291,7 +287,7 @@
         <button
           class="search-tab"
           type="button"
-          data-type="videos"
+          data-tab="videos"
           aria-selected="false"
         >
           <span>▶</span>
@@ -302,7 +298,7 @@
         <button
           class="search-tab"
           type="button"
-          data-type="news"
+          data-tab="news"
           aria-selected="false"
         >
           <span>◉</span>
@@ -312,9 +308,7 @@
       </nav>
 
 
-      <!-- =================================================
-           RESULT HEADER
-      ================================================== -->
+      <!-- RESULT HEADER -->
 
       <div class="results-header">
 
@@ -346,7 +340,7 @@
 
 
       <!-- =================================================
-           ALL / WEB RESULTS
+           RESULTS CONTAINER
       ================================================== -->
 
       <div
@@ -365,7 +359,10 @@
         hidden
       >
 
-        <div class="media-loading" hidden>
+        <div
+          class="media-loading"
+          hidden
+        >
 
           <div class="spinner"></div>
 
@@ -394,7 +391,10 @@
         hidden
       >
 
-        <div class="media-loading" hidden>
+        <div
+          class="media-loading"
+          hidden
+        >
 
           <div class="spinner"></div>
 
@@ -423,7 +423,10 @@
         hidden
       >
 
-        <div class="media-loading" hidden>
+        <div
+          class="media-loading"
+          hidden
+        >
 
           <div class="spinner"></div>
 
@@ -442,9 +445,7 @@
       </div>
 
 
-      <!-- =================================================
-           EMPTY STATE
-      ================================================== -->
+      <!-- EMPTY STATE -->
 
       <div
         id="emptyState"
@@ -467,9 +468,7 @@
       </div>
 
 
-      <!-- =================================================
-           LOADING STATE
-      ================================================== -->
+      <!-- LOADING STATE -->
 
       <div
         id="loadingState"
@@ -486,9 +485,7 @@
       </div>
 
 
-      <!-- =================================================
-           PAGINATION
-      ================================================== -->
+      <!-- PAGINATION -->
 
       <div
         id="pagination"
@@ -520,9 +517,9 @@
     </section>
 
 
-    <!-- =================================================
+    <!-- ===================================================
          HOME INFORMATION
-    ================================================== -->
+    ==================================================== -->
 
     <section
       id="homeInfo"
@@ -664,6 +661,7 @@
   ====================================================== -->
 
   <script src="app.js"></script>
+
 
 </body>
 </html>
