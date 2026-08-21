@@ -3,59 +3,43 @@
 <head>
   <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <meta
     name="description"
     content="Rise From Broken - Smart multilingual search engine for web, images, videos and news."
   >
 
-  <meta
-    name="theme-color"
-    content="#0b0f19"
-  >
+  <meta name="theme-color" content="#0b0f19">
 
   <title>Rise From Broken — Search</title>
 
-  <!-- Main stylesheet -->
   <link rel="stylesheet" href="style.css">
 
   <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    defer
+  ></script>
 </head>
 
 <body>
 
-  <!-- =====================================================
-       HEADER
-  ====================================================== -->
+  <!-- ================= HEADER ================= -->
 
   <header class="site-header">
-
     <div class="header-inner">
 
-      <a
-        href="#"
-        class="brand"
-        aria-label="Rise From Broken Home"
-      >
+      <a href="#" class="brand" aria-label="Rise From Broken Home">
 
         <div class="brand-logo">
-
           <img
             src="assets/shuch-logo.png"
             alt="Rise From Broken Logo"
             onerror="this.style.display='none'"
           >
 
-          <span class="brand-fallback">
-            RFB
-          </span>
-
+          <span class="brand-fallback">RFB</span>
         </div>
 
         <div class="brand-text">
@@ -71,7 +55,7 @@
           id="themeBtn"
           class="icon-btn"
           type="button"
-          aria-label="Toggle dark and light mode"
+          aria-label="Toggle theme"
           title="Toggle theme"
         >
           ☾
@@ -80,20 +64,14 @@
       </div>
 
     </div>
-
   </header>
 
 
-  <!-- =====================================================
-       MAIN
-  ====================================================== -->
+  <!-- ================= MAIN ================= -->
 
   <main class="main-container">
 
-
-    <!-- ===================================================
-         HERO
-    ==================================================== -->
+    <!-- HERO -->
 
     <section class="hero">
 
@@ -111,12 +89,10 @@
 
         </div>
 
-
         <h1>
           Search the world.
           <span>Your way.</span>
         </h1>
-
 
         <p class="hero-description">
           A smart, fast and multilingual search experience
@@ -134,13 +110,9 @@
             autocomplete="off"
           >
 
-            <span
-              class="search-icon"
-              aria-hidden="true"
-            >
+            <span class="search-icon">
               ⌕
             </span>
-
 
             <input
               id="searchInput"
@@ -152,34 +124,28 @@
               autocomplete="off"
             >
 
-
             <button
               id="voiceBtn"
               class="search-action"
               type="button"
               aria-label="Voice search"
-              title="Voice search"
             >
               🎙
             </button>
-
 
             <button
               id="clearBtn"
               class="search-action"
               type="button"
               aria-label="Clear search"
-              title="Clear search"
               hidden
             >
               ×
             </button>
 
-
             <button
               class="search-submit"
               type="submit"
-              aria-label="Search"
             >
               Search
             </button>
@@ -187,7 +153,7 @@
           </form>
 
 
-          <!-- SUGGESTIONS -->
+          <!-- Suggestions -->
 
           <div
             id="suggestions"
@@ -244,9 +210,7 @@
     </section>
 
 
-    <!-- ===================================================
-         SEARCH CONTENT
-    ==================================================== -->
+    <!-- ================= SEARCH CONTENT ================= -->
 
     <section
       id="resultsSection"
@@ -254,8 +218,7 @@
       hidden
     >
 
-
-      <!-- SEARCH TABS -->
+      <!-- TABS -->
 
       <nav
         class="search-tabs"
@@ -272,7 +235,6 @@
           All
         </button>
 
-
         <button
           class="search-tab"
           type="button"
@@ -283,7 +245,6 @@
           Images
         </button>
 
-
         <button
           class="search-tab"
           type="button"
@@ -293,7 +254,6 @@
           <span>▶</span>
           Videos
         </button>
-
 
         <button
           class="search-tab"
@@ -327,7 +287,6 @@
 
         </div>
 
-
         <div
           id="searchLanguage"
           class="search-language"
@@ -340,109 +299,16 @@
 
 
       <!-- =================================================
-           RESULTS CONTAINER
+           IMPORTANT:
+           app.js uses #results for ALL results,
+           IMAGES, VIDEOS and NEWS.
+           So there must be only one main results container.
       ================================================== -->
 
       <div
         id="results"
         class="results-list"
       ></div>
-
-
-      <!-- =================================================
-           IMAGE RESULTS
-      ================================================== -->
-
-      <div
-        id="imageResults"
-        class="image-results"
-        hidden
-      >
-
-        <div
-          class="media-loading"
-          hidden
-        >
-
-          <div class="spinner"></div>
-
-          <p>
-            Loading images...
-          </p>
-
-        </div>
-
-
-        <div
-          id="imagesGrid"
-          class="images-grid"
-        ></div>
-
-      </div>
-
-
-      <!-- =================================================
-           VIDEO RESULTS
-      ================================================== -->
-
-      <div
-        id="videoResults"
-        class="video-results"
-        hidden
-      >
-
-        <div
-          class="media-loading"
-          hidden
-        >
-
-          <div class="spinner"></div>
-
-          <p>
-            Loading videos...
-          </p>
-
-        </div>
-
-
-        <div
-          id="videosGrid"
-          class="videos-grid"
-        ></div>
-
-      </div>
-
-
-      <!-- =================================================
-           NEWS RESULTS
-      ================================================== -->
-
-      <div
-        id="newsResults"
-        class="news-results"
-        hidden
-      >
-
-        <div
-          class="media-loading"
-          hidden
-        >
-
-          <div class="spinner"></div>
-
-          <p>
-            Loading news...
-          </p>
-
-        </div>
-
-
-        <div
-          id="newsList"
-          class="news-list"
-        ></div>
-
-      </div>
 
 
       <!-- EMPTY STATE -->
@@ -517,9 +383,7 @@
     </section>
 
 
-    <!-- ===================================================
-         HOME INFORMATION
-    ==================================================== -->
+    <!-- ================= HOME INFO ================= -->
 
     <section
       id="homeInfo"
@@ -573,8 +437,8 @@
         </h3>
 
         <p>
-          Lightweight frontend with a structure ready
-          for powerful search APIs and databases.
+          Lightweight frontend with powerful
+          search APIs and database support.
         </p>
 
       </div>
@@ -602,9 +466,7 @@
   </main>
 
 
-  <!-- =====================================================
-       FOOTER
-  ====================================================== -->
+  <!-- ================= FOOTER ================= -->
 
   <footer class="site-footer">
 
@@ -649,19 +511,14 @@
   </footer>
 
 
-  <!-- =====================================================
-       CONFIG
-  ====================================================== -->
+  <!-- ================= CONFIG ================= -->
 
   <script src="config.js"></script>
 
 
-  <!-- =====================================================
-       MAIN APPLICATION
-  ====================================================== -->
+  <!-- ================= MAIN APP ================= -->
 
   <script src="app.js"></script>
-
 
 </body>
 </html>
