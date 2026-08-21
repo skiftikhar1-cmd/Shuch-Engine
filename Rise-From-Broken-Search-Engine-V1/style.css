@@ -9,8 +9,11 @@
   --text: #f5f7fb;
   --muted: #9aa5b5;
   --border: rgba(255, 255, 255, 0.08);
-  --accent: #7c8cff;
-  --accent-2: #5d6df5;
+
+  /* 🔴 RED THEME */
+  --accent: #ff3b3b;
+  --accent-2: #d71920;
+
   --danger: #ff6b6b;
 
   --radius-sm: 10px;
@@ -197,7 +200,9 @@ a {
 
 .icon-btn:hover {
   background: var(--surface-2);
-  border-color: rgba(124, 140, 255, 0.4);
+
+  border-color:
+    rgba(255, 59, 59, 0.4);
 }
 
 
@@ -342,7 +347,7 @@ a {
 
 .search-box:focus-within {
   border-color:
-    rgba(124, 140, 255, 0.65);
+    rgba(255, 59, 59, 0.65);
 
   box-shadow:
     0 12px 35px
@@ -541,7 +546,7 @@ a {
   background: var(--surface);
 
   border-color:
-    rgba(124, 140, 255, 0.4);
+    rgba(255, 59, 59, 0.4);
 }
 
 
@@ -612,12 +617,17 @@ a {
 }
 
 .search-tab.active {
-  color: var(--text);
+  color: white;
 
-  background: var(--surface);
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent-2)
+    );
 
   border-color:
-    rgba(124, 140, 255, 0.35);
+    rgba(255, 59, 59, 0.45);
 
   box-shadow:
     0 5px 15px
@@ -705,7 +715,7 @@ a {
 
 .result:hover {
   border-color:
-    rgba(124, 140, 255, 0.4);
+    rgba(255, 59, 59, 0.4);
 
   background: var(--surface-2);
 
@@ -1153,7 +1163,7 @@ a {
 
 
 /* =========================================================
-   LIGHT MODE
+   LIGHT MODE — RED
 ========================================================= */
 
 body.light {
@@ -1164,8 +1174,9 @@ body.light {
   --muted: #667085;
   --border: rgba(15, 23, 42, 0.09);
 
-  --accent: #5d6df5;
-  --accent-2: #4b5ce2;
+  /* 🔴 RED LIGHT MODE */
+  --accent: #e11d2e;
+  --accent-2: #c8102e;
 }
 
 body.light .site-header {
@@ -1180,7 +1191,7 @@ body.light .search-box {
 }
 
 body.light .result:hover {
-  background: #f8f9ff;
+  background: #fff5f5;
 }
 
 
@@ -1360,3 +1371,5 @@ body.light .result:hover {
   }
 
 }
+
+
