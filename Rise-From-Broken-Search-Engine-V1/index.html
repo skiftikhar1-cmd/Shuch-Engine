@@ -1,82 +1,669 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#080808" />
-  <title>Rise From Broken — Search Beyond Limits</title>
-  <link rel="icon" type="image/png" href="assets/rise-from-broken-logo.png" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="grain"></div>
+  <meta charset="UTF-8">
 
-  <header class="topbar">
-    <a class="brand" href="./" aria-label="Rise From Broken home">
-      <img src="assets/rise-from-broken-logo.png" alt="Rise From Broken logo" />
-      <span>RISE FROM BROKEN</span>
-    </a>
-    <nav>
-      <a href="#about">About</a>
-      <button id="themeBtn" class="icon-btn" aria-label="Toggle theme">◐</button>
-    </nav>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Rise From Broken - Smart multilingual search engine for web, images, videos and news."
+  >
+
+  <meta
+    name="theme-color"
+    content="#0b0f19"
+  >
+
+  <title>Rise From Broken — Search</title>
+
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Supabase -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    defer
+  ></script>
+</head>
+
+<body>
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <header class="site-header">
+
+    <div class="header-inner">
+
+      <!-- Logo -->
+      <a
+        href="#"
+        class="brand"
+        aria-label="Rise From Broken Home"
+      >
+
+        <div class="brand-logo">
+          <img
+            src="assets/shuch-logo.png"
+            alt="Rise From Broken Logo"
+            onerror="this.style.display='none'"
+          >
+
+          <span class="brand-fallback">
+            RFB
+          </span>
+        </div>
+
+        <div class="brand-text">
+          <strong>Rise From Broken</strong>
+          <span>Search Engine</span>
+        </div>
+
+      </a>
+
+
+      <!-- Header actions -->
+      <div class="header-actions">
+
+        <button
+          id="themeBtn"
+          class="icon-btn"
+          type="button"
+          aria-label="Toggle dark and light mode"
+          title="Toggle theme"
+        >
+          ☾
+        </button>
+
+      </div>
+
+    </div>
+
   </header>
 
-  <main>
-    <section class="hero" id="home">
-      <div class="hero-logo">
-        <img src="assets/rise-from-broken-logo.png" alt="Rise From Broken pirate logo" />
-      </div>
-      <p class="eyebrow">RISE FROM BROKEN PRESENTS</p>
-      <h1>Search <span>Beyond</span><br/>Limits.</h1>
-      <p class="tagline">Fast. Clean. Focused. <b>RISE FROM BROKEN</b> is built to find what matters.</p>
 
-      <form id="searchForm" class="search-box">
-        <span class="search-icon">⌕</span>
-        <input id="searchInput" type="search" autocomplete="off"
-               placeholder="Search the web..." aria-label="Search the web" />
-        <button type="submit">SEARCH</button>
-      </form>
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
 
-      <div id="suggestions" class="suggestions" hidden></div>
-      <p class="hint">Try: <button class="quick" data-q="Python programming">Python programming</button>
-        <button class="quick" data-q="Cyber security">Cyber security</button>
-        <button class="quick" data-q="Web development">Web development</button></p>
-    </section>
+  <main class="main-container">
 
-    <section class="results-wrap" id="resultsSection" hidden>
-      <div class="results-head">
-        <div>
-          <span class="eyebrow">SEARCH RESULTS</span>
-          <h2 id="resultsTitle">Results</h2>
+
+    <!-- =================================================
+         HERO / SEARCH
+    ================================================== -->
+
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <div class="hero-logo">
+
+          <img
+            src="assets/shuch-logo.png"
+            alt="Rise From Broken"
+            onerror="this.style.display='none'"
+          >
+
+          <span>RFB</span>
+
         </div>
-        <span id="resultCount" class="count"></span>
+
+
+        <h1>
+          Search the world.
+          <span>Your way.</span>
+        </h1>
+
+        <p class="hero-description">
+          A smart, fast and multilingual search experience
+          for the web, images, videos and news.
+        </p>
+
+
+        <!-- Search box -->
+
+        <div class="search-wrapper">
+
+          <form
+            id="searchForm"
+            class="search-box"
+            autocomplete="off"
+          >
+
+            <span
+              class="search-icon"
+              aria-hidden="true"
+            >
+              ⌕
+            </span>
+
+
+            <input
+              id="searchInput"
+              name="q"
+              type="search"
+              placeholder="Search anything..."
+              aria-label="Search"
+              spellcheck="false"
+              autocomplete="off"
+            >
+
+
+            <!-- Voice search UI -->
+            <button
+              id="voiceBtn"
+              class="search-action"
+              type="button"
+              aria-label="Voice search"
+              title="Voice search"
+            >
+              🎙
+            </button>
+
+
+            <!-- Clear -->
+            <button
+              id="clearBtn"
+              class="search-action"
+              type="button"
+              aria-label="Clear search"
+              title="Clear search"
+              hidden
+            >
+              ×
+            </button>
+
+
+            <button
+              class="search-submit"
+              type="submit"
+              aria-label="Search"
+            >
+              Search
+            </button>
+
+          </form>
+
+
+          <!-- Suggestions -->
+
+          <div
+            id="suggestions"
+            class="suggestions"
+            hidden
+            role="listbox"
+          ></div>
+
+        </div>
+
+
+        <!-- Quick searches -->
+
+        <div class="quick-searches">
+
+          <span>Try:</span>
+
+          <button
+            class="quick"
+            type="button"
+            data-q="Python"
+          >
+            Python
+          </button>
+
+          <button
+            class="quick"
+            type="button"
+            data-q="Bangladesh"
+          >
+            Bangladesh
+          </button>
+
+          <button
+            class="quick"
+            type="button"
+            data-q="Artificial Intelligence"
+          >
+            AI
+          </button>
+
+          <button
+            class="quick"
+            type="button"
+            data-q="Technology"
+          >
+            Technology
+          </button>
+
+        </div>
+
       </div>
-      <div id="results"></div>
-      <div id="emptyState" class="empty" hidden>
-        <div class="empty-mark">⌕</div>
-        <h3>No results found</h3>
-        <p>Try another keyword or a broader search.</p>
-      </div>
+
     </section>
 
-    <section class="features" id="about">
-      <div class="section-label">WHY RISE FROM BROKEN</div>
-      <div class="feature-grid">
-        <article><b>01</b><h3>Lightweight</h3><p>No clutter. A fast interface designed around the search.</p></article>
-        <article><b>02</b><h3>Relevant</h3><p>Ranking can grow from simple text matching into a smarter engine.</p></article>
-        <article><b>03</b><h3>Private-minded</h3><p>Built so your search experience can stay focused and transparent.</p></article>
+
+    <!-- =================================================
+         SEARCH CONTENT
+    ================================================== -->
+
+    <section
+      id="resultsSection"
+      class="search-content"
+      hidden
+    >
+
+
+      <!-- Search navigation -->
+
+      <nav
+        class="search-tabs"
+        aria-label="Search categories"
+      >
+
+        <button
+          class="search-tab active"
+          type="button"
+          data-type="all"
+          aria-selected="true"
+        >
+          <span>⌕</span>
+          All
+        </button>
+
+
+        <button
+          class="search-tab"
+          type="button"
+          data-type="images"
+          aria-selected="false"
+        >
+          <span>▧</span>
+          Images
+        </button>
+
+
+        <button
+          class="search-tab"
+          type="button"
+          data-type="videos"
+          aria-selected="false"
+        >
+          <span>▶</span>
+          Videos
+        </button>
+
+
+        <button
+          class="search-tab"
+          type="button"
+          data-type="news"
+          aria-selected="false"
+        >
+          <span>◉</span>
+          News
+        </button>
+
+      </nav>
+
+
+      <!-- =================================================
+           RESULT HEADER
+      ================================================== -->
+
+      <div class="results-header">
+
+        <div>
+
+          <h2 id="resultsTitle">
+            Search Results
+          </h2>
+
+          <p
+            id="resultCount"
+            class="result-count"
+          >
+            0 results
+          </p>
+
+        </div>
+
+
+        <div
+          id="searchLanguage"
+          class="search-language"
+          hidden
+        >
+          Language: Auto
+        </div>
+
       </div>
+
+
+      <!-- =================================================
+           ALL / WEB RESULTS
+      ================================================== -->
+
+      <div
+        id="results"
+        class="results-list"
+      ></div>
+
+
+      <!-- =================================================
+           IMAGE RESULTS
+      ================================================== -->
+
+      <div
+        id="imageResults"
+        class="image-results"
+        hidden
+      >
+
+        <div class="media-loading" hidden>
+
+          <div class="spinner"></div>
+
+          <p>
+            Loading images...
+          </p>
+
+        </div>
+
+
+        <div
+          id="imagesGrid"
+          class="images-grid"
+        ></div>
+
+      </div>
+
+
+      <!-- =================================================
+           VIDEO RESULTS
+      ================================================== -->
+
+      <div
+        id="videoResults"
+        class="video-results"
+        hidden
+      >
+
+        <div class="media-loading" hidden>
+
+          <div class="spinner"></div>
+
+          <p>
+            Loading videos...
+          </p>
+
+        </div>
+
+
+        <div
+          id="videosGrid"
+          class="videos-grid"
+        ></div>
+
+      </div>
+
+
+      <!-- =================================================
+           NEWS RESULTS
+      ================================================== -->
+
+      <div
+        id="newsResults"
+        class="news-results"
+        hidden
+      >
+
+        <div class="media-loading" hidden>
+
+          <div class="spinner"></div>
+
+          <p>
+            Loading news...
+          </p>
+
+        </div>
+
+
+        <div
+          id="newsList"
+          class="news-list"
+        ></div>
+
+      </div>
+
+
+      <!-- =================================================
+           EMPTY STATE
+      ================================================== -->
+
+      <div
+        id="emptyState"
+        class="empty"
+        hidden
+      >
+
+        <div class="empty-mark">
+          ⌕
+        </div>
+
+        <h3>
+          No results found
+        </h3>
+
+        <p>
+          Try another search or check your spelling.
+        </p>
+
+      </div>
+
+
+      <!-- =================================================
+           LOADING STATE
+      ================================================== -->
+
+      <div
+        id="loadingState"
+        class="loading-state"
+        hidden
+      >
+
+        <div class="spinner"></div>
+
+        <p>
+          Searching the web...
+        </p>
+
+      </div>
+
+
+      <!-- =================================================
+           PAGINATION
+      ================================================== -->
+
+      <div
+        id="pagination"
+        class="pagination"
+        hidden
+      >
+
+        <button
+          id="previousPage"
+          type="button"
+          disabled
+        >
+          ← Previous
+        </button>
+
+        <span id="pageNumber">
+          1
+        </span>
+
+        <button
+          id="nextPage"
+          type="button"
+        >
+          Next →
+        </button>
+
+      </div>
+
     </section>
+
+
+    <!-- =================================================
+         HOME INFORMATION
+    ================================================== -->
+
+    <section
+      id="homeInfo"
+      class="home-info"
+    >
+
+      <div class="info-card">
+
+        <div class="info-icon">
+          🔎
+        </div>
+
+        <h3>
+          Smart Search
+        </h3>
+
+        <p>
+          Search with normal spelling, different cases,
+          and multilingual queries.
+        </p>
+
+      </div>
+
+
+      <div class="info-card">
+
+        <div class="info-icon">
+          🌍
+        </div>
+
+        <h3>
+          Multilingual
+        </h3>
+
+        <p>
+          Built to support English, বাংলা, Banglish
+          and other Unicode languages.
+        </p>
+
+      </div>
+
+
+      <div class="info-card">
+
+        <div class="info-icon">
+          ⚡
+        </div>
+
+        <h3>
+          Fast
+        </h3>
+
+        <p>
+          Lightweight frontend with a structure ready
+          for powerful search APIs and databases.
+        </p>
+
+      </div>
+
+
+      <div class="info-card">
+
+        <div class="info-icon">
+          🛡️
+        </div>
+
+        <h3>
+          Privacy Focused
+        </h3>
+
+        <p>
+          Rise From Broken is designed with a
+          privacy-conscious search experience in mind.
+        </p>
+
+      </div>
+
+    </section>
+
   </main>
 
-  <footer>
-    <span>© 2026 RISE FROM BROKEN</span>
-    <span>RISE FROM BROKEN</span>
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+
+  <footer class="site-footer">
+
+    <div class="footer-inner">
+
+      <div class="footer-brand">
+
+        <strong>
+          Rise From Broken
+        </strong>
+
+        <span>
+          Search Engine
+        </span>
+
+      </div>
+
+
+      <div class="footer-links">
+
+        <a href="#">
+          About
+        </a>
+
+        <a href="#">
+          Privacy
+        </a>
+
+        <a href="#">
+          Terms
+        </a>
+
+      </div>
+
+
+      <p class="copyright">
+        © 2026 Rise From Broken. All rights reserved.
+      </p>
+
+    </div>
+
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- =====================================================
+       CONFIG
+  ====================================================== -->
+
   <script src="config.js"></script>
+
+
+  <!-- =====================================================
+       MAIN APPLICATION
+  ====================================================== -->
+
   <script src="app.js"></script>
+
 </body>
 </html>
