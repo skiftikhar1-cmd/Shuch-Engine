@@ -1,53 +1,85 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <meta
     name="description"
-    content="Rise From Broken - Smart multilingual search engine for web, images, videos and news."
+    content="Rise From Broken - Smart multilingual search engine with AI answers, web, images, videos and news."
   >
 
-  <meta name="theme-color" content="#0b0f19">
+  <meta
+    name="theme-color"
+    content="#0b0f19"
+  >
 
   <title>Rise From Broken — Search</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 
   <!-- Supabase -->
   <script
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     defer
   ></script>
+
 </head>
+
 
 <body>
 
-  <!-- ================= HEADER ================= -->
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
 
   <header class="site-header">
+
     <div class="header-inner">
 
-      <a href="#" class="brand" aria-label="Rise From Broken Home">
+      <a
+        href="#"
+        class="brand"
+        aria-label="Rise From Broken Home"
+      >
 
         <div class="brand-logo">
+
           <img
             src="assets/shuch-logo.png"
             alt="Rise From Broken Logo"
             onerror="this.style.display='none'"
           >
 
-          <span class="brand-fallback">RFB</span>
+          <span class="brand-fallback">
+            RFB
+          </span>
+
         </div>
 
         <div class="brand-text">
-          <strong>Rise From Broken</strong>
-          <span>Search Engine</span>
+
+          <strong>
+            Rise From Broken
+          </strong>
+
+          <span>
+            Search Engine
+          </span>
+
         </div>
 
       </a>
+
 
       <div class="header-actions">
 
@@ -64,18 +96,26 @@
       </div>
 
     </div>
+
   </header>
 
 
-  <!-- ================= MAIN ================= -->
+
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
 
   <main class="main-container">
 
-    <!-- HERO -->
+
+    <!-- ===================================================
+         HERO
+    ==================================================== -->
 
     <section class="hero">
 
       <div class="hero-content">
+
 
         <div class="hero-logo">
 
@@ -85,22 +125,29 @@
             onerror="this.style.display='none'"
           >
 
-          <span>RFB</span>
+          <span>
+            RFB
+          </span>
 
         </div>
+
 
         <h1>
           Search the world.
           <span>Your way.</span>
         </h1>
 
+
         <p class="hero-description">
           A smart, fast and multilingual search experience
-          for the web, images, videos and news.
+          for the web, images, videos, news and AI answers.
         </p>
 
 
-        <!-- SEARCH -->
+
+        <!-- ===============================================
+             MAIN SEARCH
+        ================================================ -->
 
         <div class="search-wrapper">
 
@@ -117,6 +164,7 @@
               ⌕
             </span>
 
+
             <input
               id="searchInput"
               name="q"
@@ -126,6 +174,7 @@
               spellcheck="false"
               autocomplete="off"
             >
+
 
             <button
               id="voiceBtn"
@@ -137,6 +186,7 @@
               🎙
             </button>
 
+
             <button
               id="clearBtn"
               class="search-action"
@@ -147,6 +197,7 @@
             >
               ×
             </button>
+
 
             <button
               class="search-submit"
@@ -171,11 +222,17 @@
         </div>
 
 
-        <!-- QUICK SEARCH -->
+
+        <!-- ===============================================
+             QUICK SEARCH
+        ================================================ -->
 
         <div class="quick-searches">
 
-          <span>Try:</span>
+          <span>
+            Try:
+          </span>
+
 
           <button
             class="quick"
@@ -185,6 +242,7 @@
             Python
           </button>
 
+
           <button
             class="quick"
             type="button"
@@ -193,6 +251,7 @@
             Bangladesh
           </button>
 
+
           <button
             class="quick"
             type="button"
@@ -200,6 +259,7 @@
           >
             AI
           </button>
+
 
           <button
             class="quick"
@@ -216,7 +276,10 @@
     </section>
 
 
-    <!-- ================= SEARCH CONTENT ================= -->
+
+    <!-- =====================================================
+         SEARCH CONTENT
+    ====================================================== -->
 
     <section
       id="resultsSection"
@@ -224,61 +287,159 @@
       hidden
     >
 
-      <!-- TABS -->
+
+      <!-- =================================================
+           SEARCH TABS
+      ================================================== -->
 
       <nav
         class="search-tabs"
         aria-label="Search categories"
       >
 
+
+        <!-- RFB ASK -->
+
+        <button
+          class="search-tab rfb-ask-tab"
+          type="button"
+          data-tab="ask"
+          aria-selected="false"
+        >
+
+          <span>
+            🤖
+          </span>
+
+          RFB Ask
+
+        </button>
+
+
+
         <!-- ALL -->
+
         <button
           class="search-tab active"
           type="button"
           data-tab="all"
           aria-selected="true"
         >
-          <span>⌕</span>
+
+          <span>
+            ⌕
+          </span>
+
           All
+
         </button>
 
+
+
         <!-- IMAGES -->
+
         <button
           class="search-tab"
           type="button"
           data-tab="images"
           aria-selected="false"
         >
-          <span>▧</span>
+
+          <span>
+            ▧
+          </span>
+
           Images
+
         </button>
 
+
+
         <!-- VIDEOS -->
+
         <button
           class="search-tab"
           type="button"
           data-tab="videos"
           aria-selected="false"
         >
-          <span>▶</span>
+
+          <span>
+            ▶
+          </span>
+
           Videos
+
         </button>
 
+
+
         <!-- NEWS -->
+
         <button
           class="search-tab"
           type="button"
           data-tab="news"
           aria-selected="false"
         >
-          <span>◉</span>
+
+          <span>
+            ◉
+          </span>
+
           News
+
         </button>
 
       </nav>
 
 
-      <!-- RESULT HEADER -->
+
+      <!-- =================================================
+           RFB ASK WEB SUMMARY
+           
+           যখন All search করা হবে তখন এখানে:
+           "RFB Ask: ..." 
+           ১ লাইনের AI explanation আসবে।
+      ================================================== -->
+
+      <section
+        id="rfbWebAnswer"
+        class="rfb-web-answer"
+        hidden
+      >
+
+        <div class="rfb-web-answer-header">
+
+          <span class="rfb-web-answer-icon">
+            🤖
+          </span>
+
+          <strong>
+            RFB Ask
+          </strong>
+
+        </div>
+
+
+        <div
+          id="rfbWebAnswerText"
+          class="rfb-web-answer-text"
+        ></div>
+
+
+        <div
+          id="rfbWebSources"
+          class="rfb-web-sources"
+        ></div>
+
+      </section>
+
+
+
+      <!-- =================================================
+           RESULT HEADER
+      ================================================== -->
 
       <div class="results-header">
 
@@ -288,6 +449,7 @@
             Search Results
           </h2>
 
+
           <p
             id="resultCount"
             class="result-count"
@@ -296,6 +458,7 @@
           </p>
 
         </div>
+
 
         <div
           id="searchLanguage"
@@ -308,7 +471,10 @@
       </div>
 
 
-      <!-- MAIN RESULT CONTAINER -->
+
+      <!-- =================================================
+           MAIN RESULT CONTAINER
+      ================================================== -->
 
       <div
         id="results"
@@ -316,7 +482,10 @@
       ></div>
 
 
-      <!-- EMPTY STATE -->
+
+      <!-- =================================================
+           EMPTY STATE
+      ================================================== -->
 
       <div
         id="emptyState"
@@ -328,9 +497,11 @@
           ⌕
         </div>
 
+
         <h3>
           No results found
         </h3>
+
 
         <p>
           Try another search or check your spelling.
@@ -339,7 +510,10 @@
       </div>
 
 
-      <!-- LOADING STATE -->
+
+      <!-- =================================================
+           LOADING STATE
+      ================================================== -->
 
       <div
         id="loadingState"
@@ -349,6 +523,7 @@
 
         <div class="spinner"></div>
 
+
         <p>
           Searching the web...
         </p>
@@ -356,7 +531,10 @@
       </div>
 
 
-      <!-- PAGINATION -->
+
+      <!-- =================================================
+           PAGINATION
+      ================================================== -->
 
       <div
         id="pagination"
@@ -372,9 +550,11 @@
           ← Previous
         </button>
 
+
         <span id="pageNumber">
           1
         </span>
+
 
         <button
           id="nextPage"
@@ -388,12 +568,114 @@
     </section>
 
 
-    <!-- ================= HOME INFO ================= -->
+
+    <!-- =====================================================
+         STANDALONE RFB ASK
+         
+         এটি আলাদা AI section।
+         কেউ Search Engine-এর normal search না করে
+         সরাসরি AI-কে প্রশ্ন করতে পারবে।
+    ====================================================== -->
+
+    <section
+      id="rfbAskSection"
+      class="rfb-ai-box"
+      hidden
+    >
+
+      <div class="rfb-ai-header">
+
+        <div class="rfb-ai-icon">
+          🤖
+        </div>
+
+        <div>
+
+          <h2>
+            RFB Ask
+          </h2>
+
+          <p>
+            Ask anything and get an AI-powered answer.
+          </p>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="rfb-ai-row">
+
+        <input
+          type="text"
+          id="rfbAiInput"
+          class="rfb-ai-input"
+          placeholder="যেকোনো প্রশ্ন করো..."
+          autocomplete="off"
+          spellcheck="false"
+        >
+
+
+        <button
+          id="rfbAiBtn"
+          class="rfb-ai-btn"
+          type="button"
+        >
+          জিজ্ঞাসা করো
+        </button>
+
+      </div>
+
+
+
+      <div
+        id="rfbAiLoading"
+        class="rfb-ai-loading"
+        hidden
+      >
+        উত্তর খোঁজা হচ্ছে...
+      </div>
+
+
+
+      <div
+        id="rfbAiAnswer"
+        class="rfb-ai-answer"
+        hidden
+      ></div>
+
+
+
+      <div
+        id="rfbAiSources"
+        class="rfb-ai-sources"
+        hidden
+      >
+
+        <strong>
+          Sources
+        </strong>
+
+        <div
+          id="rfbAiSourceList"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         HOME INFO
+    ====================================================== -->
 
     <section
       id="homeInfo"
       class="home-info"
     >
+
 
       <div class="info-card">
 
@@ -401,9 +683,11 @@
           🔎
         </div>
 
+
         <h3>
           Smart Search
         </h3>
+
 
         <p>
           Search with normal spelling, different cases,
@@ -413,15 +697,18 @@
       </div>
 
 
+
       <div class="info-card">
 
         <div class="info-icon">
           🌍
         </div>
 
+
         <h3>
           Multilingual
         </h3>
+
 
         <p>
           Built to support English, বাংলা, Banglish
@@ -431,15 +718,39 @@
       </div>
 
 
+
+      <div class="info-card">
+
+        <div class="info-icon">
+          🤖
+        </div>
+
+
+        <h3>
+          RFB Ask
+        </h3>
+
+
+        <p>
+          Ask questions and get AI-powered answers
+          with web search information when available.
+        </p>
+
+      </div>
+
+
+
       <div class="info-card">
 
         <div class="info-icon">
           ⚡
         </div>
 
+
         <h3>
           Fast
         </h3>
+
 
         <p>
           Lightweight frontend with powerful
@@ -449,15 +760,18 @@
       </div>
 
 
+
       <div class="info-card">
 
         <div class="info-icon">
           🛡️
         </div>
 
+
         <h3>
           Privacy Focused
         </h3>
+
 
         <p>
           Rise From Broken is designed with a
@@ -471,11 +785,15 @@
   </main>
 
 
-  <!-- ================= FOOTER ================= -->
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
 
   <footer class="site-footer">
 
     <div class="footer-inner">
+
 
       <div class="footer-brand">
 
@@ -488,6 +806,7 @@
         </span>
 
       </div>
+
 
 
       <div class="footer-links">
@@ -507,6 +826,7 @@
       </div>
 
 
+
       <p class="copyright">
         © 2026 Rise From Broken. All rights reserved.
       </p>
@@ -516,146 +836,48 @@
   </footer>
 
 
-  <!-- ================= CONFIG ================= -->
+
+  <!-- =====================================================
+       CONFIG
+  ====================================================== -->
 
   <script src="config.js"></script>
 
-  <!-- ================= MAIN APP ================= -->
+
+
+  <!-- =====================================================
+       MAIN APP
+  ====================================================== -->
 
   <script src="app.js"></script>
-  <!--
-  AI Assistant Widget — Rise From Broken
-  ব্যবহার: এই পুরো ব্লকটা (HTML + CSS + JS) তোমার সাইটের index.html এর
-  </body> ট্যাগের ঠিক আগে পেস্ট করে দাও। ব্যাস, কাজ শেষ!
--->
 
-<style>
-  .rfb-ai-box {
-    max-width: 640px;
-    margin: 24px auto;
-    padding: 18px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    font-family: inherit;
-  }
-  .rfb-ai-box h3 {
-    margin: 0 0 10px 0;
-    font-size: 15px;
-    opacity: 0.85;
-  }
-  .rfb-ai-row {
-    display: flex;
-    gap: 8px;
-  }
-  .rfb-ai-input {
-    flex: 1;
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.05);
-    color: inherit;
-    font-size: 14px;
-    outline: none;
-  }
-  .rfb-ai-input:focus {
-    border-color: rgba(255, 255, 255, 0.4);
-  }
-  .rfb-ai-btn {
-    padding: 10px 18px;
-    border-radius: 10px;
-    border: none;
-    background: #4f7cff;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  .rfb-ai-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  .rfb-ai-answer {
-    margin-top: 14px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    background: rgba(79, 124, 255, 0.1);
-    border: 1px solid rgba(79, 124, 255, 0.25);
-    font-size: 14px;
-    line-height: 1.6;
-    display: none;
-  }
-  .rfb-ai-answer.show {
-    display: block;
-  }
-  .rfb-ai-loading {
-    font-size: 13px;
-    opacity: 0.7;
-    margin-top: 10px;
-    display: none;
-  }
-  .rfb-ai-loading.show {
-    display: block;
-  }
-</style>
 
-<div class="rfb-ai-box">
-  <h3>🤖 RFB Ask</h3>
-  <div class="rfb-ai-row">
-    <input
-      type="text"
-      id="rfbAiInput"
-      class="rfb-ai-input"
-      placeholder="যেকোনো প্রশ্ন করো... (যেমন: ২৫×৪ কত? বা ঢাকার আজকের আবহাওয়া)"
-    />
-    <button id="rfbAiBtn" class="rfb-ai-btn">জিজ্ঞাসা করো</button>
-  </div>
-  <div id="rfbAiLoading" class="rfb-ai-loading">উত্তর খোঁজা হচ্ছে...</div>
-  <div id="rfbAiAnswer" class="rfb-ai-answer"></div>
-</div>
 
-<script>
-  (function () {
-    const input = document.getElementById("rfbAiInput");
-    const btn = document.getElementById("rfbAiBtn");
-    const answerBox = document.getElementById("rfbAiAnswer");
-    const loadingBox = document.getElementById("rfbAiLoading");
+  <!-- =====================================================
+       FALLBACK RFB ASK UI LOGIC
+       
+       Main functionality will be handled by app.js.
+       This section only provides the HTML structure.
+  ====================================================== -->
 
-    async function askAI() {
-      const question = input.value.trim();
-      if (!question) return;
+  <script>
 
-      btn.disabled = true;
-      answerBox.classList.remove("show");
-      loadingBox.classList.add("show");
+    /*
+      RFB Ask is controlled by app.js.
 
-      try {
-        const res = await fetch("/api/ask", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question }),
-        });
+      Important:
+      Do NOT add another /api/ask fetch script here.
 
-        const data = await res.json();
+      Otherwise the AI request could run twice.
+    */
 
-        if (!res.ok) {
-          answerBox.textContent = "⚠️ " + (data.error || "কিছু একটা সমস্যা হয়েছে");
-        } else {
-          answerBox.textContent = data.answer;
-        }
-      } catch (err) {
-        answerBox.textContent = "⚠️ নেটওয়ার্ক সমস্যা, আবার চেষ্টা করো";
-      } finally {
-        loadingBox.classList.remove("show");
-        answerBox.classList.add("show");
-        btn.disabled = false;
-      }
-    }
+    console.log(
+      "RFB Ask UI loaded."
+    );
 
-    btn.addEventListener("click", askAI);
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") askAI();
-    });
-  })();
-</script>
+  </script>
+
+
 </body>
 </html>
+```
