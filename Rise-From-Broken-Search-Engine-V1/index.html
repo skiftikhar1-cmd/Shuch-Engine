@@ -1,883 +1,442 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <meta
     name="description"
-    content="Rise From Broken - Smart multilingual search engine with AI answers, web, images, videos and news."
+    content="Rise From Broken — Smart multilingual search engine for web, images, videos, news and AI answers."
   >
 
-  <meta
-    name="theme-color"
-    content="#0b0f19"
-  >
+  <meta name="theme-color" content="#0b0f19">
 
   <title>Rise From Broken — Search</title>
 
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
+  <link rel="stylesheet" href="style.css">
 
-  <!-- Supabase -->
   <script
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     defer
   ></script>
-
 </head>
-
 
 <body>
 
-  <!-- =====================================================
-       HEADER
-  ====================================================== -->
+<header class="site-header">
+  <div class="header-inner">
 
-  <header class="site-header">
+    <a href="/" class="brand">
+      <div class="brand-logo">
+        <img
+          src="assets/shuch-logo.png"
+          alt="Rise From Broken"
+          onerror="this.style.display='none'"
+        >
+        <span>RFB</span>
+      </div>
 
-    <div class="header-inner">
+      <div class="brand-text">
+        <strong>Rise From Broken</strong>
+        <span>Search Engine</span>
+      </div>
+    </a>
 
-      <a
-        href="#"
-        class="brand"
-        aria-label="Rise From Broken Home"
-      >
+    <button
+      id="themeBtn"
+      class="icon-btn"
+      type="button"
+      aria-label="Toggle theme"
+    >
+      ☾
+    </button>
 
-        <div class="brand-logo">
+  </div>
+</header>
 
-          <img
-            src="assets/shuch-logo.png"
-            alt="Rise From Broken Logo"
-            onerror="this.style.display='none'"
+
+<main class="main-container">
+
+  <!-- HOME / SEARCH -->
+
+  <section class="hero">
+
+    <div class="hero-content">
+
+      <div class="hero-logo">
+        <img
+          src="assets/shuch-logo.png"
+          alt="Rise From Broken"
+          onerror="this.style.display='none'"
+        >
+        <span>RFB</span>
+      </div>
+
+      <h1>
+        Search the world.
+        <span>Your way.</span>
+      </h1>
+
+      <p class="hero-description">
+        Search the web, images, videos, news and ask RFB AI.
+      </p>
+
+
+      <div class="search-wrapper">
+
+        <form
+          id="searchForm"
+          class="search-box"
+          autocomplete="off"
+        >
+
+          <span class="search-icon">⌕</span>
+
+          <input
+            id="searchInput"
+            name="q"
+            type="search"
+            placeholder="Search anything..."
+            autocomplete="off"
+            spellcheck="false"
           >
 
-          <span class="brand-fallback">
-            RFB
-          </span>
+          <button
+            id="voiceBtn"
+            class="search-action"
+            type="button"
+            title="Voice search"
+          >
+            🎙
+          </button>
 
-        </div>
+          <button
+            id="clearBtn"
+            class="search-action"
+            type="button"
+            title="Clear"
+            hidden
+          >
+            ×
+          </button>
 
-        <div class="brand-text">
+          <button
+            class="search-submit"
+            type="submit"
+          >
+            Search
+          </button>
 
-          <strong>
-            Rise From Broken
-          </strong>
+        </form>
 
-          <span>
-            Search Engine
-          </span>
+        <div
+          id="suggestions"
+          class="suggestions"
+          hidden
+        ></div>
 
-        </div>
-
-      </a>
+      </div>
 
 
-      <div class="header-actions">
+      <div class="quick-searches">
 
-        <button
-          id="themeBtn"
-          class="icon-btn"
-          type="button"
-          aria-label="Toggle theme"
-          title="Toggle theme"
-        >
-          ☾
+        <span>Try:</span>
+
+        <button class="quick" data-q="Python">
+          Python
+        </button>
+
+        <button class="quick" data-q="Bangladesh">
+          Bangladesh
+        </button>
+
+        <button class="quick" data-q="Artificial Intelligence">
+          AI
+        </button>
+
+        <button class="quick" data-q="Technology">
+          Technology
         </button>
 
       </div>
 
     </div>
 
-  </header>
+  </section>
 
 
+  <!-- SEARCH AREA -->
 
-  <!-- =====================================================
-       MAIN
-  ====================================================== -->
+  <section
+    id="resultsSection"
+    class="search-content"
+    hidden
+  >
 
-  <main class="main-container">
+    <!-- TABS -->
+
+    <nav class="search-tabs">
+
+      <button
+        class="search-tab active"
+        data-tab="ask"
+        type="button"
+      >
+        <span>🤖</span>
+        RFB Ask
+      </button>
+
+      <button
+        class="search-tab"
+        data-tab="all"
+        type="button"
+      >
+        <span>⌕</span>
+        All
+      </button>
+
+      <button
+        class="search-tab"
+        data-tab="images"
+        type="button"
+      >
+        <span>▧</span>
+        Images
+      </button>
+
+      <button
+        class="search-tab"
+        data-tab="videos"
+        type="button"
+      >
+        <span>▶</span>
+        Videos
+      </button>
+
+      <button
+        class="search-tab"
+        data-tab="news"
+        type="button"
+      >
+        <span>◉</span>
+        News
+      </button>
+
+    </nav>
 
 
-    <!-- ===================================================
-         HERO
-    ==================================================== -->
+    <!-- RESULT HEADER -->
 
-    <section class="hero">
+    <div class="results-header">
 
-      <div class="hero-content">
+      <div>
+        <h2 id="resultsTitle">
+          Search Results
+        </h2>
 
-
-        <div class="hero-logo">
-
-          <img
-            src="assets/shuch-logo.png"
-            alt="Rise From Broken"
-            onerror="this.style.display='none'"
-          >
-
-          <span>
-            RFB
-          </span>
-
-        </div>
-
-
-        <h1>
-          Search the world.
-          <span>Your way.</span>
-        </h1>
-
-
-        <p class="hero-description">
-          A smart, fast and multilingual search experience
-          for the web, images, videos, news and AI answers.
+        <p id="resultCount" class="result-count">
+          0 results
         </p>
-
-
-
-        <!-- ===============================================
-             MAIN SEARCH
-        ================================================ -->
-
-        <div class="search-wrapper">
-
-          <form
-            id="searchForm"
-            class="search-box"
-            autocomplete="off"
-          >
-
-            <span
-              class="search-icon"
-              aria-hidden="true"
-            >
-              ⌕
-            </span>
-
-
-            <input
-              id="searchInput"
-              name="q"
-              type="search"
-              placeholder="Search anything..."
-              aria-label="Search"
-              spellcheck="false"
-              autocomplete="off"
-            >
-
-
-            <button
-              id="voiceBtn"
-              class="search-action"
-              type="button"
-              aria-label="Voice search"
-              title="Voice search"
-            >
-              🎙
-            </button>
-
-
-            <button
-              id="clearBtn"
-              class="search-action"
-              type="button"
-              aria-label="Clear search"
-              title="Clear search"
-              hidden
-            >
-              ×
-            </button>
-
-
-            <button
-              class="search-submit"
-              type="submit"
-              aria-label="Search"
-            >
-              Search
-            </button>
-
-          </form>
-
-
-          <!-- Suggestions -->
-
-          <div
-            id="suggestions"
-            class="suggestions"
-            hidden
-            role="listbox"
-          ></div>
-
-        </div>
-
-
-
-        <!-- ===============================================
-             QUICK SEARCH
-        ================================================ -->
-
-        <div class="quick-searches">
-
-          <span>
-            Try:
-          </span>
-
-
-          <button
-            class="quick"
-            type="button"
-            data-q="Python"
-          >
-            Python
-          </button>
-
-
-          <button
-            class="quick"
-            type="button"
-            data-q="Bangladesh"
-          >
-            Bangladesh
-          </button>
-
-
-          <button
-            class="quick"
-            type="button"
-            data-q="Artificial Intelligence"
-          >
-            AI
-          </button>
-
-
-          <button
-            class="quick"
-            type="button"
-            data-q="Technology"
-          >
-            Technology
-          </button>
-
-        </div>
-
       </div>
 
-    </section>
+    </div>
 
 
-
-    <!-- =====================================================
-         SEARCH CONTENT
-    ====================================================== -->
+    <!-- RFB ASK -->
 
     <section
-      id="resultsSection"
-      class="search-content"
+      id="rfbAskPanel"
+      class="rfb-ask-panel"
       hidden
     >
 
-
-      <!-- =================================================
-           SEARCH TABS
-      ================================================== -->
-
-      <nav
-        class="search-tabs"
-        aria-label="Search categories"
-      >
-
-
-        <!-- RFB ASK -->
-
-        <button
-          class="search-tab rfb-ask-tab"
-          type="button"
-          data-tab="ask"
-          aria-selected="false"
-        >
-
-          <span>
-            🤖
-          </span>
-
-          RFB Ask
-
-        </button>
-
-
-
-        <!-- ALL -->
-
-        <button
-          class="search-tab active"
-          type="button"
-          data-tab="all"
-          aria-selected="true"
-        >
-
-          <span>
-            ⌕
-          </span>
-
-          All
-
-        </button>
-
-
-
-        <!-- IMAGES -->
-
-        <button
-          class="search-tab"
-          type="button"
-          data-tab="images"
-          aria-selected="false"
-        >
-
-          <span>
-            ▧
-          </span>
-
-          Images
-
-        </button>
-
-
-
-        <!-- VIDEOS -->
-
-        <button
-          class="search-tab"
-          type="button"
-          data-tab="videos"
-          aria-selected="false"
-        >
-
-          <span>
-            ▶
-          </span>
-
-          Videos
-
-        </button>
-
-
-
-        <!-- NEWS -->
-
-        <button
-          class="search-tab"
-          type="button"
-          data-tab="news"
-          aria-selected="false"
-        >
-
-          <span>
-            ◉
-          </span>
-
-          News
-
-        </button>
-
-      </nav>
-
-
-
-      <!-- =================================================
-           RFB ASK WEB SUMMARY
-           
-           যখন All search করা হবে তখন এখানে:
-           "RFB Ask: ..." 
-           ১ লাইনের AI explanation আসবে।
-      ================================================== -->
-
-      <section
-        id="rfbWebAnswer"
-        class="rfb-web-answer"
-        hidden
-      >
-
-        <div class="rfb-web-answer-header">
-
-          <span class="rfb-web-answer-icon">
-            🤖
-          </span>
-
-          <strong>
-            RFB Ask
-          </strong>
-
-        </div>
-
-
-        <div
-          id="rfbWebAnswerText"
-          class="rfb-web-answer-text"
-        ></div>
-
-
-        <div
-          id="rfbWebSources"
-          class="rfb-web-sources"
-        ></div>
-
-      </section>
-
-
-
-      <!-- =================================================
-           RESULT HEADER
-      ================================================== -->
-
-      <div class="results-header">
+      <div class="ask-header">
+        <div class="ask-icon">🤖</div>
 
         <div>
-
-          <h2 id="resultsTitle">
-            Search Results
-          </h2>
-
-
-          <p
-            id="resultCount"
-            class="result-count"
-          >
-            0 results
-          </p>
-
+          <h3>RFB Ask</h3>
+          <p>Ask Rise From Broken AI</p>
         </div>
-
-
-        <div
-          id="searchLanguage"
-          class="search-language"
-          hidden
-        >
-          Language: Auto
-        </div>
-
       </div>
 
-
-
-      <!-- =================================================
-           MAIN RESULT CONTAINER
-      ================================================== -->
-
-      <div
-        id="results"
-        class="results-list"
-      ></div>
-
-
-
-      <!-- =================================================
-           EMPTY STATE
-      ================================================== -->
-
-      <div
-        id="emptyState"
-        class="empty"
-        hidden
-      >
-
-        <div class="empty-mark">
-          ⌕
-        </div>
-
-
-        <h3>
-          No results found
-        </h3>
-
-
-        <p>
-          Try another search or check your spelling.
-        </p>
-
-      </div>
-
-
-
-      <!-- =================================================
-           LOADING STATE
-      ================================================== -->
-
-      <div
-        id="loadingState"
-        class="loading-state"
-        hidden
-      >
-
-        <div class="spinner"></div>
-
-
-        <p>
-          Searching the web...
-        </p>
-
-      </div>
-
-
-
-      <!-- =================================================
-           PAGINATION
-      ================================================== -->
-
-      <div
-        id="pagination"
-        class="pagination"
-        hidden
-      >
-
-        <button
-          id="previousPage"
-          type="button"
-          disabled
-        >
-          ← Previous
-        </button>
-
-
-        <span id="pageNumber">
-          1
-        </span>
-
-
-        <button
-          id="nextPage"
-          type="button"
-        >
-          Next →
-        </button>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- =====================================================
-         STANDALONE RFB ASK
-         
-         এটি আলাদা AI section।
-         কেউ Search Engine-এর normal search না করে
-         সরাসরি AI-কে প্রশ্ন করতে পারবে।
-    ====================================================== -->
-
-    <section
-      id="rfbAskSection"
-      class="rfb-ai-box"
-      hidden
-    >
-
-      <div class="rfb-ai-header">
-
-        <div class="rfb-ai-icon">
-          🤖
-        </div>
-
-        <div>
-
-          <h2>
-            RFB Ask
-          </h2>
-
-          <p>
-            Ask anything and get an AI-powered answer.
-          </p>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="rfb-ai-row">
+      <div class="ask-input-row">
 
         <input
+          id="rfbAskInput"
           type="text"
-          id="rfbAiInput"
-          class="rfb-ai-input"
-          placeholder="যেকোনো প্রশ্ন করো..."
+          placeholder="Ask anything..."
           autocomplete="off"
-          spellcheck="false"
         >
-
 
         <button
-          id="rfbAiBtn"
-          class="rfb-ai-btn"
+          id="rfbAskButton"
           type="button"
         >
-          জিজ্ঞাসা করো
+          Ask
         </button>
 
       </div>
 
-
-
       <div
-        id="rfbAiLoading"
-        class="rfb-ai-loading"
+        id="rfbAskLoading"
+        class="ask-loading"
         hidden
       >
-        উত্তর খোঁজা হচ্ছে...
+        RFB is thinking...
       </div>
 
-
-
       <div
-        id="rfbAiAnswer"
-        class="rfb-ai-answer"
+        id="rfbAskAnswer"
+        class="ask-answer"
         hidden
       ></div>
 
-
-
-      <div
-        id="rfbAiSources"
-        class="rfb-ai-sources"
-        hidden
-      >
-
-        <strong>
-          Sources
-        </strong>
-
-        <div
-          id="rfbAiSourceList"
-        ></div>
-
-      </div>
-
     </section>
 
 
+    <!-- ONE LINE AI EXPLANATION -->
 
-    <!-- =====================================================
-         HOME INFO
-    ====================================================== -->
-
-    <section
-      id="homeInfo"
-      class="home-info"
+    <div
+      id="inlineAsk"
+      class="inline-ask"
+      hidden
     >
 
+      <div class="inline-ask-icon">
+        🤖
+      </div>
 
-      <div class="info-card">
+      <div class="inline-ask-content">
 
-        <div class="info-icon">
-          🔎
-        </div>
+        <strong>RFB Ask</strong>
 
-
-        <h3>
-          Smart Search
-        </h3>
-
-
-        <p>
-          Search with normal spelling, different cases,
-          and multilingual queries.
+        <p id="inlineAskText">
+          Getting a quick explanation...
         </p>
 
       </div>
 
+    </div>
 
 
-      <div class="info-card">
+    <!-- RESULTS -->
 
-        <div class="info-icon">
-          🌍
-        </div>
-
-
-        <h3>
-          Multilingual
-        </h3>
+    <div
+      id="results"
+      class="results-list"
+    ></div>
 
 
-        <p>
-          Built to support English, বাংলা, Banglish
-          and other Unicode languages.
-        </p>
+    <!-- EMPTY -->
 
+    <div
+      id="emptyState"
+      class="empty"
+      hidden
+    >
+
+      <div class="empty-mark">
+        ⌕
       </div>
 
+      <h3>
+        No results found
+      </h3>
 
-
-      <div class="info-card">
-
-        <div class="info-icon">
-          🤖
-        </div>
-
-
-        <h3>
-          RFB Ask
-        </h3>
-
-
-        <p>
-          Ask questions and get AI-powered answers
-          with web search information when available.
-        </p>
-
-      </div>
-
-
-
-      <div class="info-card">
-
-        <div class="info-icon">
-          ⚡
-        </div>
-
-
-        <h3>
-          Fast
-        </h3>
-
-
-        <p>
-          Lightweight frontend with powerful
-          search APIs and database support.
-        </p>
-
-      </div>
-
-
-
-      <div class="info-card">
-
-        <div class="info-icon">
-          🛡️
-        </div>
-
-
-        <h3>
-          Privacy Focused
-        </h3>
-
-
-        <p>
-          Rise From Broken is designed with a
-          privacy-conscious search experience in mind.
-        </p>
-
-      </div>
-
-    </section>
-
-  </main>
-
-
-
-  <!-- =====================================================
-       FOOTER
-  ====================================================== -->
-
-  <footer class="site-footer">
-
-    <div class="footer-inner">
-
-
-      <div class="footer-brand">
-
-        <strong>
-          Rise From Broken
-        </strong>
-
-        <span>
-          Search Engine
-        </span>
-
-      </div>
-
-
-
-      <div class="footer-links">
-
-        <a href="#">
-          About
-        </a>
-
-        <a href="#">
-          Privacy
-        </a>
-
-        <a href="#">
-          Terms
-        </a>
-
-      </div>
-
-
-
-      <p class="copyright">
-        © 2026 Rise From Broken. All rights reserved.
+      <p>
+        Try another search.
       </p>
 
     </div>
 
-  </footer>
+
+    <!-- LOADING -->
+
+    <div
+      id="loadingState"
+      class="loading-state"
+      hidden
+    >
+
+      <div class="spinner"></div>
+
+      <p>
+        Searching...
+      </p>
+
+    </div>
+
+  </section>
 
 
+  <!-- HOME INFO -->
 
-  <!-- =====================================================
-       CONFIG
-  ====================================================== -->
+  <section id="homeInfo" class="home-info">
 
-  <script src="config.js"></script>
+    <div class="info-card">
+      <div class="info-icon">🔎</div>
+      <h3>Smart Search</h3>
+      <p>
+        Search websites and information quickly.
+      </p>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon">🤖</div>
+      <h3>RFB Ask</h3>
+      <p>
+        Ask questions and get quick AI answers.
+      </p>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon">🌍</div>
+      <h3>Multilingual</h3>
+      <p>
+        Supports English, বাংলা, Banglish and Unicode.
+      </p>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon">⚡</div>
+      <h3>Fast</h3>
+      <p>
+        Lightweight and designed for fast searching.
+      </p>
+    </div>
+
+  </section>
+
+</main>
 
 
+<footer class="site-footer">
 
-  <!-- =====================================================
-       MAIN APP
-  ====================================================== -->
+  <div class="footer-inner">
 
-  <script src="app.js"></script>
+    <div class="footer-brand">
+      <strong>Rise From Broken</strong>
+      <span>Search Engine</span>
+    </div>
+
+    <div class="footer-links">
+      <a href="#">About</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+    </div>
+
+    <p>
+      © 2026 Rise From Broken
+    </p>
+
+  </div>
+
+</footer>
 
 
-
-  <!-- =====================================================
-       FALLBACK RFB ASK UI LOGIC
-       
-       Main functionality will be handled by app.js.
-       This section only provides the HTML structure.
-  ====================================================== -->
-
-  <script>
-
-    /*
-      RFB Ask is controlled by app.js.
-
-      Important:
-      Do NOT add another /api/ask fetch script here.
-
-      Otherwise the AI request could run twice.
-    */
-
-    console.log(
-      "RFB Ask UI loaded."
-    );
-
-  </script>
-
+<script src="config.js"></script>
+<script src="app.js"></script>
 
 </body>
 </html>
-```
