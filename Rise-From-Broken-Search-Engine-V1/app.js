@@ -3,6 +3,7 @@
 /* =========================================================
    RISE FROM BROKEN
    SEARCH + RFB ASK + IMAGES + VIDEOS + NEWS
+   YouTube Video Search — NO API KEY REQUIRED
 ========================================================= */
 
 
@@ -60,7 +61,9 @@ const tabs =
   document.querySelectorAll(".search-tab");
 
 
-/* RFB ASK */
+/* =========================================================
+   RFB ASK
+========================================================= */
 
 const rfbAskPanel =
   document.querySelector("#rfbAskPanel");
@@ -329,6 +332,109 @@ function stripHtml(value) {
 
 
 /* =========================================================
+   YOUTUBE HELPERS
+========================================================= */
+
+/*
+   YouTube URL → Video ID
+*/
+
+function getYouTubeVideoId(url) {
+
+  try {
+
+    const parsed =
+      new URL(url);
+
+    if (
+      parsed.hostname.includes("youtube.com")
+    ) {
+
+      if (
+        parsed.pathname === "/watch"
+      ) {
+
+        return parsed.searchParams.get("v");
+
+      }
+
+      if (
+        parsed.pathname.startsWith("/shorts/")
+      ) {
+
+        return parsed.pathname
+          .split("/shorts/")[1]
+          ?.split(/[/?&]/)[0];
+
+      }
+
+      if (
+        parsed.pathname.startsWith("/embed/")
+      ) {
+
+        return parsed.pathname
+          .split("/embed/")[1]
+          ?.split(/[/?&]/)[0];
+
+      }
+
+    }
+
+    if (
+      parsed.hostname === "youtu.be"
+    ) {
+
+      return parsed.pathname
+        .replace("/", "")
+        .split(/[/?&]/)[0];
+
+    }
+
+  } catch {
+
+    return null;
+
+  }
+
+  return null;
+
+}
+
+
+/*
+   Make YouTube thumbnail
+*/
+
+function youtubeThumbnail(videoId) {
+
+  if (!videoId) {
+    return "";
+  }
+
+  return (
+    "https://i.ytimg.com/vi/" +
+    encodeURIComponent(videoId) +
+    "/hqdefault.jpg"
+  );
+
+}
+
+
+/*
+   YouTube search URL
+*/
+
+function youtubeSearchUrl(query) {
+
+  return (
+    "https://www.youtube.com/results?search_query=" +
+    encodeURIComponent(query)
+  );
+
+}
+
+
+/* =========================================================
    DEMO SEARCH
 ========================================================= */
 
@@ -581,10 +687,142 @@ async function searchImages(query) {
 
 
 /* =========================================================
-   VIDEOS
+   YOUTUBE SEARCH
+   NO API KEY
 ========================================================= */
 
-async function searchVideos(query) {
+async function searchYouTube(query) {
+
+  const results = [];
+
+  try {
+
+    /*
+      YouTube search page is fetched through
+      AllOrigins so the browser does not hit
+      CORS restrictions directly.
+    */
+
+    const youtubeUrl =
+      "https://www.youtube.com/results?search_query=" +
+      encodeURIComponent(query);
+
+    const proxyUrl =
+      "https://api.allorigins.win/raw?url=" +
+      encodeURIComponent(youtubeUrl);
+
+    const response =
+      await fetch(proxyUrl);
+
+    if (!response.ok) {
+      throw new Error(
+        "YouTube search request failed"
+      );
+    }
+
+    const html =
+      await response.text();
+
+    /*
+      Extract YouTube watch URLs.
+    */
+
+    const regex =
+      /https?:\\?\/\\?\/(?:www\.)?youtube\.com\\?\/watch\?v=([A-Za-z0-9_-]{11})/g;
+
+    const ids = [];
+
+    let match;
+
+    while (
+      (match = regex.exec(html)) !== null
+    ) {
+
+      if (
+        match[1] &&
+        !ids.includes(match[1])
+      ) {
+
+        ids.push(match[1]);
+
+      }
+
+      if (ids.length >= 12) {
+        break;
+      }
+
+    }
+
+    ids.forEach((id, index) => {
+
+      results.push({
+
+        title:
+          `${query} — YouTube video ${index + 1}`,
+
+        url:
+          `https://www.youtube.com/watch?v=${id}`,
+
+        thumbnail:
+          youtubeThumbnail(id),
+
+        platform:
+          "YouTube",
+
+        videoId:
+          id
+
+      });
+
+    });
+
+  } catch (error) {
+
+    console.warn(
+      "YouTube search failed:",
+      error
+    );
+
+  }
+
+  /*
+    If YouTube parsing does not work,
+    ALWAYS provide a YouTube search card.
+  */
+
+  if (!results.length) {
+
+    results.push({
+
+      title:
+        `Search "${query}" on YouTube`,
+
+      url:
+        youtubeSearchUrl(query),
+
+      thumbnail:
+        "",
+
+      platform:
+        "YouTube",
+
+      fallback:
+        true
+
+    });
+
+  }
+
+  return results.slice(0, 12);
+
+}
+
+
+/* =========================================================
+   WIKIMEDIA VIDEO SEARCH
+========================================================= */
+
+async function searchWikimediaVideos(query) {
 
   try {
 
@@ -595,7 +833,7 @@ async function searchVideos(query) {
       "&gsrsearch=" +
       encodeURIComponent(query) +
       "&gsrnamespace=6" +
-      "&gsrlimit=60" +
+      "&gsrlimit=40" +
       "&prop=imageinfo" +
       "&iiprop=url|mime" +
       "&iiurlwidth=600" +
@@ -646,18 +884,47 @@ async function searchVideos(query) {
           url:
             info.descriptionurl ||
             info.url ||
-            "#"
+            "#",
+
+          platform:
+            "Wikimedia"
 
         };
 
       })
       .filter(Boolean)
-      .slice(0, 20);
+      .slice(0, 8);
 
   } catch {
 
     return [];
+
   }
+
+}
+
+
+/* =========================================================
+   VIDEOS
+   YouTube first + Wikimedia fallback
+========================================================= */
+
+async function searchVideos(query) {
+
+  const youtubeVideos =
+    await searchYouTube(query);
+
+  const wikimediaVideos =
+    await searchWikimediaVideos(query);
+
+  /*
+    YouTube results come first.
+  */
+
+  return [
+    ...youtubeVideos,
+    ...wikimediaVideos
+  ].slice(0, 20);
 
 }
 
@@ -725,6 +992,7 @@ async function searchNews(query) {
   } catch {
 
     return [];
+
   }
 
 }
@@ -756,7 +1024,10 @@ async function askRfb(question) {
   let data = {};
 
   try {
-    data = await response.json();
+
+    data =
+      await response.json();
+
   } catch {}
 
   if (!response.ok) {
@@ -1003,13 +1274,6 @@ function renderVideos(data) {
   resultCount.textContent =
     `${data.length} video${data.length === 1 ? "" : "s"}`;
 
-  if (!data.length) {
-
-    emptyState.hidden = false;
-
-    return;
-  }
-
   emptyState.hidden = true;
 
   const grid =
@@ -1017,6 +1281,36 @@ function renderVideos(data) {
 
   grid.className =
     "videos-grid";
+
+  /*
+    Never allow Videos tab to be empty.
+  */
+
+  if (!data || !data.length) {
+
+    data = [
+
+      {
+        title:
+          `Search "${currentQuery}" on YouTube`,
+
+        url:
+          youtubeSearchUrl(currentQuery),
+
+        thumbnail:
+          "",
+
+        platform:
+          "YouTube",
+
+        fallback:
+          true
+
+      }
+
+    ];
+
+  }
 
   data.forEach(item => {
 
@@ -1035,23 +1329,48 @@ function renderVideos(data) {
     card.rel =
       "noopener noreferrer";
 
+    let thumbnailHtml = "";
+
+    if (item.thumbnail) {
+
+      thumbnailHtml = `
+
+        <img
+          src="${escapeHtml(item.thumbnail)}"
+          alt="${escapeHtml(item.title)}"
+          loading="lazy"
+          onerror="this.style.display='none'"
+        >
+
+      `;
+
+    } else {
+
+      thumbnailHtml = `
+
+        <div class="video-placeholder">
+
+          <div class="video-placeholder-icon">
+            ▶
+          </div>
+
+          <div class="video-placeholder-text">
+            ${escapeHtml(
+              item.platform || "Video"
+            )}
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
     card.innerHTML = `
 
       <div class="video-thumbnail">
 
-        ${
-          item.thumbnail
-          ?
-          `<img
-             src="${escapeHtml(item.thumbnail)}"
-             alt="${escapeHtml(item.title)}"
-             loading="lazy"
-           >`
-          :
-          `<div class="video-placeholder">
-             🎬
-           </div>`
-        }
+        ${thumbnailHtml}
 
         <div class="video-play">
           ▶
@@ -1060,7 +1379,21 @@ function renderVideos(data) {
       </div>
 
       <div class="video-card-content">
-        ${escapeHtml(item.title)}
+
+        <div class="video-card-title">
+          ${escapeHtml(
+            item.title ||
+            "Video"
+          )}
+        </div>
+
+        <div class="video-card-platform">
+          ${escapeHtml(
+            item.platform ||
+            "Video"
+          )}
+        </div>
+
       </div>
 
     `;
@@ -1224,6 +1557,7 @@ async function runSearch(
   }
 
   currentQuery = query;
+
   currentTab = tab;
 
   input.value = query;
@@ -1253,7 +1587,7 @@ async function runSearch(
   try {
 
     /* =====================================================
-       RFB ASK TAB
+       RFB ASK
     ===================================================== */
 
     if (tab === "ask") {
@@ -1275,7 +1609,7 @@ async function runSearch(
 
 
     /* =====================================================
-       INLINE AI + ALL
+       ALL
     ===================================================== */
 
     if (tab === "all") {
@@ -1296,9 +1630,7 @@ async function runSearch(
 
       }
 
-      if (
-        !data.length
-      ) {
+      if (!data.length) {
 
         data =
           await searchWikipedia(query);
@@ -1364,9 +1696,41 @@ async function runSearch(
       error
     );
 
-    showEmpty(
-      "Search failed. Please try again."
-    );
+    /*
+      Video tab gets a guaranteed YouTube fallback.
+    */
+
+    if (tab === "videos") {
+
+      renderVideos([
+
+        {
+          title:
+            `Search "${query}" on YouTube`,
+
+          url:
+            youtubeSearchUrl(query),
+
+          thumbnail:
+            "",
+
+          platform:
+            "YouTube",
+
+          fallback:
+            true
+
+        }
+
+      ]);
+
+    } else {
+
+      showEmpty(
+        "Search failed. Please try again."
+      );
+
+    }
 
   } finally {
 
@@ -1382,21 +1746,25 @@ async function runSearch(
    FORM
 ========================================================= */
 
-form.addEventListener(
-  "submit",
-  event => {
+if (form) {
 
-    event.preventDefault();
+  form.addEventListener(
+    "submit",
+    event => {
 
-    runSearch(
-      input.value,
-      currentTab === "ask"
-        ? "all"
-        : currentTab
-    );
+      event.preventDefault();
 
-  }
-);
+      runSearch(
+        input.value,
+        currentTab === "ask"
+          ? "all"
+          : currentTab
+      );
+
+    }
+  );
+
+}
 
 
 /* =========================================================
@@ -1412,6 +1780,8 @@ tabs.forEach(tab => {
       const mode =
         tab.dataset.tab;
 
+      currentTab = mode;
+
       setActiveTab(mode);
 
       if (!currentQuery) {
@@ -1424,7 +1794,7 @@ tabs.forEach(tab => {
 
           rfbAskPanel.hidden = false;
 
-          rfbAskInput.focus();
+          rfbAskInput?.focus();
 
         }
 
@@ -1446,34 +1816,42 @@ tabs.forEach(tab => {
    ASK BUTTON
 ========================================================= */
 
-rfbAskButton.addEventListener(
-  "click",
-  () => {
+if (rfbAskButton) {
 
-    runAskPanel(
-      rfbAskInput.value
-    );
-
-  }
-);
-
-
-rfbAskInput.addEventListener(
-  "keydown",
-  event => {
-
-    if (event.key === "Enter") {
-
-      event.preventDefault();
+  rfbAskButton.addEventListener(
+    "click",
+    () => {
 
       runAskPanel(
         rfbAskInput.value
       );
 
     }
+  );
 
-  }
-);
+}
+
+
+if (rfbAskInput) {
+
+  rfbAskInput.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Enter") {
+
+        event.preventDefault();
+
+        runAskPanel(
+          rfbAskInput.value
+        );
+
+      }
+
+    }
+  );
+
+}
 
 
 /* =========================================================
@@ -1509,181 +1887,193 @@ document
    CLEAR
 ========================================================= */
 
-input.addEventListener(
-  "input",
-  () => {
+if (input) {
 
-    clearBtn.hidden =
-      !input.value.trim();
+  input.addEventListener(
+    "input",
+    () => {
 
-  }
-);
+      clearBtn.hidden =
+        !input.value.trim();
+
+    }
+  );
+
+}
 
 
-clearBtn.addEventListener(
-  "click",
-  () => {
+if (clearBtn) {
 
-    input.value = "";
+  clearBtn.addEventListener(
+    "click",
+    () => {
 
-    clearBtn.hidden = true;
+      input.value = "";
 
-    currentQuery = "";
+      clearBtn.hidden = true;
 
-    resultsSection.hidden = true;
+      currentQuery = "";
 
-    homeInfo.hidden = false;
+      resultsSection.hidden = true;
 
-    inlineAsk.hidden = true;
+      homeInfo.hidden = false;
 
-    rfbAskPanel.hidden = true;
+      inlineAsk.hidden = true;
 
-    results.innerHTML = "";
+      rfbAskPanel.hidden = true;
 
-    input.focus();
+      results.innerHTML = "";
 
-  }
-);
+      input.focus();
+
+    }
+  );
+
+}
 
 
 /* =========================================================
    VOICE SEARCH
 ========================================================= */
 
-voiceBtn.addEventListener(
-  "click",
-  () => {
+if (voiceBtn) {
 
-    const SpeechRecognition =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition;
+  voiceBtn.addEventListener(
+    "click",
+    () => {
 
-    if (!SpeechRecognition) {
+      const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
 
-      alert(
-        "Voice search is not supported in this browser."
-      );
+      if (!SpeechRecognition) {
 
-      return;
-    }
-
-    const recognition =
-      new SpeechRecognition();
-
-    recognition.lang =
-      "en-US";
-
-    recognition.interimResults =
-      false;
-
-    recognition.maxAlternatives =
-      1;
-
-    recognition.onresult =
-      event => {
-
-        const text =
-          event.results[0][0]
-            .transcript;
-
-        input.value = text;
-
-        runSearch(
-          text,
-          "all"
+        alert(
+          "Voice search is not supported in this browser."
         );
 
-      };
+        return;
+      }
 
-    recognition.start();
+      const recognition =
+        new SpeechRecognition();
 
-  }
-);
+      recognition.lang =
+        "en-US";
+
+      recognition.interimResults =
+        false;
+
+      recognition.maxAlternatives =
+        1;
+
+      recognition.onresult =
+        event => {
+
+          const text =
+            event.results[0][0]
+              .transcript;
+
+          input.value = text;
+
+          runSearch(
+            text,
+            "all"
+          );
+
+        };
+
+      recognition.start();
+
+    }
+  );
+
+}
 
 
 /* =========================================================
    SUGGESTIONS
 ========================================================= */
 
-input.addEventListener(
-  "input",
-  () => {
+if (input && suggestions) {
 
-    if (!suggestions) {
-      return;
-    }
+  input.addEventListener(
+    "input",
+    () => {
 
-    const query =
-      normalizeText(
-        input.value
-      );
-
-    if (!query) {
-
-      suggestions.hidden =
-        true;
-
-      return;
-    }
-
-    const matches =
-      demoResults
-        .map(item => item.title)
-        .filter(title =>
-          normalizeText(title)
-            .includes(query)
-        )
-        .slice(0, 6);
-
-    if (!matches.length) {
-
-      suggestions.hidden =
-        true;
-
-      return;
-    }
-
-    suggestions.innerHTML =
-      matches
-        .map(item => `
-          <button
-            class="suggestion"
-            type="button"
-          >
-            ${escapeHtml(item)}
-          </button>
-        `)
-        .join("");
-
-    suggestions.hidden =
-      false;
-
-    suggestions
-      .querySelectorAll(".suggestion")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            input.value =
-              button.textContent.trim();
-
-            suggestions.hidden =
-              true;
-
-            runSearch(
-              input.value,
-              "all"
-            );
-
-          }
+      const query =
+        normalizeText(
+          input.value
         );
 
-      });
+      if (!query) {
 
-  }
-);
+        suggestions.hidden =
+          true;
+
+        return;
+      }
+
+      const matches =
+        demoResults
+          .map(item => item.title)
+          .filter(title =>
+            normalizeText(title)
+              .includes(query)
+          )
+          .slice(0, 6);
+
+      if (!matches.length) {
+
+        suggestions.hidden =
+          true;
+
+        return;
+      }
+
+      suggestions.innerHTML =
+        matches
+          .map(item => `
+            <button
+              class="suggestion"
+              type="button"
+            >
+              ${escapeHtml(item)}
+            </button>
+          `)
+          .join("");
+
+      suggestions.hidden =
+        false;
+
+      suggestions
+        .querySelectorAll(".suggestion")
+        .forEach(button => {
+
+          button.addEventListener(
+            "click",
+            () => {
+
+              input.value =
+                button.textContent.trim();
+
+              suggestions.hidden =
+                true;
+
+              runSearch(
+                input.value,
+                "all"
+              );
+
+            }
+          );
+
+        });
+
+    }
+  );
+
+}
 
 
 /* =========================================================
@@ -1700,8 +2090,9 @@ document.addEventListener(
       )
     ) {
 
-      suggestions.hidden =
-        true;
+      if (suggestions) {
+        suggestions.hidden = true;
+      }
 
     }
 
@@ -1719,25 +2110,29 @@ const themeBtn =
   );
 
 
-themeBtn.addEventListener(
-  "click",
-  () => {
+if (themeBtn) {
 
-    document.body.classList.toggle(
-      "light"
-    );
+  themeBtn.addEventListener(
+    "click",
+    () => {
 
-    localStorage.setItem(
-      "rise-from-broken_theme",
-      document.body.classList.contains(
+      document.body.classList.toggle(
         "light"
-      )
-      ? "light"
-      : "dark"
-    );
+      );
 
-  }
-);
+      localStorage.setItem(
+        "rise-from-broken_theme",
+        document.body.classList.contains(
+          "light"
+        )
+          ? "light"
+          : "dark"
+      );
+
+    }
+  );
+
+}
 
 
 if (
@@ -1798,19 +2193,32 @@ function loadQueryFromUrl() {
    START
 ========================================================= */
 
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
+if (
+  document.readyState === "loading"
+) {
 
-    setTimeout(
-      loadQueryFromUrl,
-      100
-    );
+  document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-  }
-);
+      setTimeout(
+        loadQueryFromUrl,
+        100
+      );
+
+    }
+  );
+
+} else {
+
+  setTimeout(
+    loadQueryFromUrl,
+    100
+  );
+
+}
 
 
 console.log(
-  "Rise From Broken loaded successfully."
+  "Rise From Broken loaded successfully — YouTube Video Search enabled."
 );
