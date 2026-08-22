@@ -26,10 +26,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // ==========================================
-    // API KEYS
-    // ==========================================
-
     const OLLAMA_API_KEY = process.env.OLLAMA_API_KEY;
     const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
 
@@ -46,7 +42,7 @@ export default async function handler(req, res) {
     }
 
     // ==========================================
-    // TAVILY INTERNET SEARCH
+    // TAVILY WEB SEARCH
     // ==========================================
 
     let searchContext = "";
@@ -57,16 +53,15 @@ export default async function handler(req, res) {
         "https://api.tavily.com/search",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json"
           },
-
           body: JSON.stringify({
             api_key: TAVILY_API_KEY,
             query: question,
-            search_depth: "basic",
-            max_results: 5,
+            search_depth: "advanced",
+            topic: "general",
+            max_results: 6,
             include_answer: true,
             include_raw_content: false
           })
@@ -81,35 +76,60 @@ export default async function handler(req, res) {
           searchError
         );
 
-      } else {
-        const searchData = await searchRes.json();
+        return res.status(502).json({
+          error: `Tavily Error: ${searchError}`
+        });
+      }
 
-        // Tavily results
-        if (searchData.results?.length) {
-          searchContext = searchData.results
-            .map(
-              (r, i) =>
-                `[${i + 1}]
-Title: ${r.title}
-URL: ${r.url}
-Content: ${r.content}`
-            )
-            .join("\n\n");
+      const searchData = await searchRes.json();
 
-          sources = searchData.results.map((r) => ({
-            title: r.title,
-            url: r.url
-          }));
-        }
+      // ------------------------------------------
+      // Tavily direct answer
+      // ------------------------------------------
 
-        // Tavily direct answer
-        if (searchData.answer) {
-          searchContext =
-            `Tavily Answer:
+      if (searchData.answer) {
+        searchContext += `
+TAVILY DIRECT ANSWER:
 ${searchData.answer}
 
-${searchContext}`;
-        }
+`;
+      }
+
+      // ------------------------------------------
+      // Search results
+      // ------------------------------------------
+
+      if (searchData.results?.length) {
+        searchData.results.forEach((r, i) => {
+          searchContext += `
+SOURCE ${i + 1}
+Title: ${r.title || ""}
+URL: ${r.url || ""}
+Content:
+${r.content || ""}
+--------------------------------
+`;
+
+          if (r.title && r.url) {
+            sources.push({
+              title: r.title,
+              url: r.url
+            });
+          }
+        });
+      }
+
+      // ------------------------------------------
+      // No search result
+      // ------------------------------------------
+
+      if (!searchContext.trim()) {
+        return res.status(200).json({
+          answer:
+            "দুঃখিত, এই প্রশ্নের জন্য বর্তমানে নির্ভরযোগ্য Internet Search Result পাওয়া যায়নি।",
+          usedSearch: false,
+          sources: []
+        });
       }
 
     } catch (searchError) {
@@ -117,6 +137,10 @@ ${searchContext}`;
         "Tavily search error:",
         searchError
       );
+
+      return res.status(502).json({
+        error: `Tavily Search Error: ${searchError.message}`
+      });
     }
 
     // ==========================================
@@ -128,45 +152,65 @@ ${searchContext}`;
 
 তুমি Rise From Broken সার্চ ইঞ্জিনের AI Assistant।
 
-তোমার কাজ:
+সবচেয়ে গুরুত্বপূর্ণ নিয়ম:
 
-1. ইউজারের প্রশ্ন বুঝবে।
-2. Internet Search Result দেওয়া থাকলে সেটা ব্যবহার করবে।
-3. সাম্প্রতিক তথ্যের ক্ষেত্রে Search Result-কে অগ্রাধিকার দেবে।
-4. Search Result না থাকলে নিজের জ্ঞান ব্যবহার করবে।
-5. Search Result-এর তথ্য বানিয়ে পরিবর্তন করবে না।
-6. বাংলা প্রশ্নের উত্তর বাংলায় দেবে।
-7. ইংরেজি প্রশ্নের উত্তর ইংরেজিতে দেবে।
-8. বাংলিশ প্রশ্ন হলে বাংলিশে উত্তর দেওয়ার চেষ্টা করবে।
-9. গণিতের প্রশ্ন হলে সরাসরি সঠিক উত্তর দেবে।
-10. সাধারণ উত্তর সংক্ষিপ্ত রাখবে।
-11. সাধারণত ১-৪ লাইনে উত্তর দেবে।
-12. অপ্রয়োজনীয় ভূমিকা দেবে না।
+তোমাকে Internet Search Result দেওয়া হবে।
+সাম্প্রতিক বা পরিবর্তনশীল তথ্যের ক্ষেত্রে Internet Search Result-ই
+তোমার প্রধান এবং অগ্রাধিকারপ্রাপ্ত তথ্যের উৎস।
+
+যদি তোমার নিজের পুরোনো knowledge এবং Internet Search Result-এর মধ্যে
+কোনো পার্থক্য থাকে, তাহলে Internet Search Result অনুসরণ করবে।
+
+কখনো নিজের পুরোনো knowledge ব্যবহার করে Search Result-এর বর্তমান তথ্য
+বাতিল করবে না।
+
+নিয়ম:
+
+1. Search Result ভালোভাবে পড়বে।
+2. একাধিক source থাকলে তথ্য মিলিয়ে দেখবে।
+3. বর্তমান ব্যক্তি, পদ, সরকার, খবর, রাজনীতি, দাম, আবহাওয়া,
+   খেলাধুলা বা অন্য পরিবর্তনশীল তথ্যের ক্ষেত্রে Search Result-কে
+   সর্বোচ্চ অগ্রাধিকার দেবে।
+4. Search Result-এ স্পষ্ট তথ্য থাকলে সেটাই উত্তর দেবে।
+5. Search Result-এর বাইরে কোনো তথ্য বানিয়ে বলবে না।
+6. Search Result পরস্পরবিরোধী হলে সেটা উল্লেখ করবে।
+7. বাংলা প্রশ্নের উত্তর বাংলায় দেবে।
+8. ইংরেজি প্রশ্নের উত্তর ইংরেজিতে দেবে।
+9. বাংলিশ প্রশ্ন হলে বাংলিশে উত্তর দেওয়ার চেষ্টা করবে।
+10. গণিতের প্রশ্ন হলে সরাসরি সঠিক উত্তর দেবে।
+11. সাধারণ উত্তর সংক্ষিপ্ত রাখবে।
+12. সাধারণত ১-৪ লাইনের মধ্যে উত্তর দেবে।
+13. অপ্রয়োজনীয় ভূমিকা দেবে না।
+14. উত্তর দেওয়ার আগে "উত্তর:" লিখবে না।
+15. Search Result-এর URL বা source নিজে থেকে বানাবে না।
 
 কেউ তোমার নাম জিজ্ঞেস করলে বলবে:
 
 "আমি RFB Ask — Rise From Broken-এর AI Assistant।"
 `;
 
-    const userPrompt = searchContext
-      ? `
-প্রশ্ন:
+    // ==========================================
+    // USER PROMPT
+    // ==========================================
+
+    const userPrompt = `
+USER QUESTION:
 ${question}
 
-নিচের Internet Search Result ব্যবহার করে প্রশ্নটির উত্তর দাও:
-
+CURRENT INTERNET SEARCH RESULTS:
 ${searchContext}
-`
-      : `
-প্রশ্ন:
-${question}
 
-কোনো Internet Search Result পাওয়া যায়নি।
-নিজের জ্ঞান ব্যবহার করে উত্তর দাও।
+উপরের Internet Search Result ব্যবহার করে প্রশ্নটির উত্তর দাও।
+
+বিশেষ নির্দেশনা:
+- Search Result-এর তথ্যকে অগ্রাধিকার দাও।
+- নিজের পুরোনো knowledge দিয়ে Search Result-এর তথ্য পরিবর্তন করো না।
+- বর্তমান তথ্য হলে Search Result-এর সাম্প্রতিক তথ্য ব্যবহার করো।
+- Search Result-এ উত্তর পাওয়া গেলে সরাসরি সেই তথ্য অনুযায়ী উত্তর দাও।
 `;
 
     // ==========================================
-    // OLLAMA CLOUD — GPT OSS
+    // OLLAMA CLOUD
     // ==========================================
 
     const aiRes = await fetch(
@@ -227,7 +271,7 @@ ${question}
 
     return res.status(200).json({
       answer,
-      usedSearch: Boolean(searchContext),
+      usedSearch: true,
       sources
     });
 
