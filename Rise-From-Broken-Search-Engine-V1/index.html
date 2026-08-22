@@ -523,6 +523,139 @@
   <!-- ================= MAIN APP ================= -->
 
   <script src="app.js"></script>
+  <!--
+  AI Assistant Widget — Rise From Broken
+  ব্যবহার: এই পুরো ব্লকটা (HTML + CSS + JS) তোমার সাইটের index.html এর
+  </body> ট্যাগের ঠিক আগে পেস্ট করে দাও। ব্যাস, কাজ শেষ!
+-->
 
+<style>
+  .rfb-ai-box {
+    max-width: 640px;
+    margin: 24px auto;
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-family: inherit;
+  }
+  .rfb-ai-box h3 {
+    margin: 0 0 10px 0;
+    font-size: 15px;
+    opacity: 0.85;
+  }
+  .rfb-ai-row {
+    display: flex;
+    gap: 8px;
+  }
+  .rfb-ai-input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+    color: inherit;
+    font-size: 14px;
+    outline: none;
+  }
+  .rfb-ai-input:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  .rfb-ai-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    background: #4f7cff;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .rfb-ai-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .rfb-ai-answer {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(79, 124, 255, 0.1);
+    border: 1px solid rgba(79, 124, 255, 0.25);
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+  }
+  .rfb-ai-answer.show {
+    display: block;
+  }
+  .rfb-ai-loading {
+    font-size: 13px;
+    opacity: 0.7;
+    margin-top: 10px;
+    display: none;
+  }
+  .rfb-ai-loading.show {
+    display: block;
+  }
+</style>
+
+<div class="rfb-ai-box">
+  <h3>🤖 RFB Ask</h3>
+  <div class="rfb-ai-row">
+    <input
+      type="text"
+      id="rfbAiInput"
+      class="rfb-ai-input"
+      placeholder="যেকোনো প্রশ্ন করো... (যেমন: ২৫×৪ কত? বা ঢাকার আজকের আবহাওয়া)"
+    />
+    <button id="rfbAiBtn" class="rfb-ai-btn">জিজ্ঞাসা করো</button>
+  </div>
+  <div id="rfbAiLoading" class="rfb-ai-loading">উত্তর খোঁজা হচ্ছে...</div>
+  <div id="rfbAiAnswer" class="rfb-ai-answer"></div>
+</div>
+
+<script>
+  (function () {
+    const input = document.getElementById("rfbAiInput");
+    const btn = document.getElementById("rfbAiBtn");
+    const answerBox = document.getElementById("rfbAiAnswer");
+    const loadingBox = document.getElementById("rfbAiLoading");
+
+    async function askAI() {
+      const question = input.value.trim();
+      if (!question) return;
+
+      btn.disabled = true;
+      answerBox.classList.remove("show");
+      loadingBox.classList.add("show");
+
+      try {
+        const res = await fetch("/api/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          answerBox.textContent = "⚠️ " + (data.error || "কিছু একটা সমস্যা হয়েছে");
+        } else {
+          answerBox.textContent = data.answer;
+        }
+      } catch (err) {
+        answerBox.textContent = "⚠️ নেটওয়ার্ক সমস্যা, আবার চেষ্টা করো";
+      } finally {
+        loadingBox.classList.remove("show");
+        answerBox.classList.add("show");
+        btn.disabled = false;
+      }
+    }
+
+    btn.addEventListener("click", askAI);
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") askAI();
+    });
+  })();
+</script>
 </body>
 </html>
