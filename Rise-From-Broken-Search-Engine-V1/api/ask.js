@@ -1,6 +1,6 @@
 // /api/ask.js
 // Rise From Broken — RFB Ask
-// Ollama Cloud + GLM-5
+// Ollama Cloud + GPT-OSS 20B
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -42,27 +42,24 @@ export default async function handler(req, res) {
 নিয়ম:
 - বাংলা প্রশ্নের উত্তর বাংলায় দেবে।
 - ইংরেজি প্রশ্নের উত্তর ইংরেজিতে দেবে।
-- বাংলিশ হলে বাংলিশেই উত্তর দেওয়ার চেষ্টা করবে।
+- বাংলিশ প্রশ্ন হলে বাংলিশে উত্তর দেওয়ার চেষ্টা করবে।
 - সাধারণ প্রশ্নের উত্তর সংক্ষিপ্ত রাখবে।
 - গণিতের প্রশ্ন হলে সরাসরি সঠিক উত্তর দেবে।
-- যেমন: 25 × 48 = 1200
 - অপ্রয়োজনীয় ভূমিকা দেবে না।
 - কেউ তোমার নাম জিজ্ঞেস করলে বলবে:
-  "আমি RFB Ask — Rise From Broken-এর AI Assistant।"
+"আমি RFB Ask — Rise From Broken-এর AI Assistant।"
 `;
 
     const aiRes = await fetch(
       "https://ollama.com/api/chat",
       {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${OLLAMA_API_KEY}`
         },
-
         body: JSON.stringify({
-          model: "glm-5",
+          model: "gpt-oss:20b-cloud",
           messages: [
             {
               role: "system",
