@@ -1,22 +1,8 @@
-```javascript
 "use strict";
 
 /* =========================================================
-   RISE FROM BROKEN — FINAL SEARCH ENGINE
-   ---------------------------------------------------------
-   ALL
-   ├── RFB Ask 1-line explanation
-   └── Web results
-
-   RFB ASK
-   └── Full AI answer + sources
-
-   IMAGES
-   VIDEOS
-   NEWS
-
-   Supabase + Wikipedia + Wikimedia + Google News
-   RFB Ask → /api/ask
+   RISE FROM BROKEN
+   SEARCH + RFB ASK + IMAGES + VIDEOS + NEWS
 ========================================================= */
 
 
@@ -25,7 +11,7 @@
 ========================================================= */
 
 const cfg =
-    window.RISE_FROM_BROKEN_CONFIG || {};
+  window.RISE_FROM_BROKEN_CONFIG || {};
 
 let supabaseClient = null;
 
@@ -35,80 +21,67 @@ let supabaseClient = null;
 ========================================================= */
 
 const form =
-    document.querySelector("#searchForm");
+  document.querySelector("#searchForm");
 
 const input =
-    document.querySelector("#searchInput");
+  document.querySelector("#searchInput");
 
 const resultsSection =
-    document.querySelector("#resultsSection");
+  document.querySelector("#resultsSection");
 
 const results =
-    document.querySelector("#results");
+  document.querySelector("#results");
 
 const emptyState =
-    document.querySelector("#emptyState");
-
-const title =
-    document.querySelector("#resultsTitle");
-
-const count =
-    document.querySelector("#resultCount");
-
-const suggestions =
-    document.querySelector("#suggestions");
-
-const tabs =
-    document.querySelectorAll(".search-tab");
+  document.querySelector("#emptyState");
 
 const loadingState =
-    document.querySelector("#loadingState");
+  document.querySelector("#loadingState");
+
+const resultsTitle =
+  document.querySelector("#resultsTitle");
+
+const resultCount =
+  document.querySelector("#resultCount");
 
 const clearBtn =
-    document.querySelector("#clearBtn");
+  document.querySelector("#clearBtn");
 
 const voiceBtn =
-    document.querySelector("#voiceBtn");
+  document.querySelector("#voiceBtn");
+
+const suggestions =
+  document.querySelector("#suggestions");
+
+const homeInfo =
+  document.querySelector("#homeInfo");
+
+const tabs =
+  document.querySelectorAll(".search-tab");
 
 
-/* =========================================================
-   RFB WEB ANSWER DOM
-========================================================= */
+/* RFB ASK */
 
-const rfbWebAnswer =
-    document.querySelector("#rfbWebAnswer");
+const rfbAskPanel =
+  document.querySelector("#rfbAskPanel");
 
-const rfbWebAnswerText =
-    document.querySelector("#rfbWebAnswerText");
+const rfbAskInput =
+  document.querySelector("#rfbAskInput");
 
-const rfbWebSources =
-    document.querySelector("#rfbWebSources");
+const rfbAskButton =
+  document.querySelector("#rfbAskButton");
 
+const rfbAskLoading =
+  document.querySelector("#rfbAskLoading");
 
-/* =========================================================
-   RFB ASK DOM
-========================================================= */
+const rfbAskAnswer =
+  document.querySelector("#rfbAskAnswer");
 
-const rfbAskSection =
-    document.querySelector("#rfbAskSection");
+const inlineAsk =
+  document.querySelector("#inlineAsk");
 
-const rfbAiInput =
-    document.querySelector("#rfbAiInput");
-
-const rfbAiBtn =
-    document.querySelector("#rfbAiBtn");
-
-const rfbAiLoading =
-    document.querySelector("#rfbAiLoading");
-
-const rfbAiAnswer =
-    document.querySelector("#rfbAiAnswer");
-
-const rfbAiSources =
-    document.querySelector("#rfbAiSources");
-
-const rfbAiSourceList =
-    document.querySelector("#rfbAiSourceList");
+const inlineAskText =
+  document.querySelector("#inlineAskText");
 
 
 /* =========================================================
@@ -116,110 +89,74 @@ const rfbAiSourceList =
 ========================================================= */
 
 let currentQuery = "";
-
 let currentTab = "all";
 
 
 /* =========================================================
-   SUPABASE INITIALIZATION
+   SUPABASE
 ========================================================= */
 
 function initSupabase() {
 
-    if (
-        !cfg.SUPABASE_URL ||
-        !cfg.SUPABASE_ANON_KEY
-    ) {
+  if (
+    !cfg.SUPABASE_URL ||
+    !cfg.SUPABASE_ANON_KEY
+  ) {
+    return;
+  }
 
-        console.warn(
-            "Supabase configuration missing."
-        );
+  if (
+    !window.supabase ||
+    typeof window.supabase.createClient !== "function"
+  ) {
+    return;
+  }
 
-        return;
-    }
+  try {
 
+    supabaseClient =
+      window.supabase.createClient(
+        cfg.SUPABASE_URL,
+        cfg.SUPABASE_ANON_KEY
+      );
 
-    if (
-        !window.supabase ||
-        typeof window.supabase.createClient !==
-            "function"
-    ) {
+  } catch (error) {
 
-        console.warn(
-            "Supabase library not ready."
-        );
+    console.warn(
+      "Supabase initialization failed:",
+      error
+    );
 
-        return;
-    }
-
-
-    try {
-
-        supabaseClient =
-            window.supabase.createClient(
-                cfg.SUPABASE_URL,
-                cfg.SUPABASE_ANON_KEY
-            );
-
-
-        console.log(
-            "Rise From Broken: Supabase connected."
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Supabase initialization error:",
-            error
-        );
-
-        supabaseClient = null;
-
-    }
+    supabaseClient = null;
+  }
 
 }
 
 
-/* =========================================================
-   WAIT FOR SUPABASE
-========================================================= */
-
 (function waitForSupabase() {
 
-    let attempts = 0;
+  let attempts = 0;
 
+  const timer =
+    setInterval(() => {
 
-    const timer =
-        setInterval(() => {
+      attempts++;
 
-            attempts++;
+      if (window.supabase) {
 
+        clearInterval(timer);
 
-            if (window.supabase) {
+        initSupabase();
 
-                clearInterval(timer);
+      }
 
-                initSupabase();
+      if (attempts >= 50) {
 
-            }
+        clearInterval(timer);
 
+      }
 
-            if (attempts >= 50) {
-
-                clearInterval(timer);
-
-
-                if (!supabaseClient) {
-
-                    console.warn(
-                        "Supabase library was not loaded."
-                    );
-
-                }
-
-            }
-
-        }, 100);
+    }, 100);
 
 })();
 
@@ -230,192 +167,163 @@ function initSupabase() {
 
 const demoResults = [
 
-    {
-        title: "Python",
-        url: "https://www.python.org/",
-        description:
-            "Python is a powerful programming language used for software development, automation, data science and artificial intelligence.",
-        keywords:
-            "python programming coding software developer language ai"
-    },
+  {
+    title: "Python",
+    url: "https://www.python.org/",
+    description:
+      "Python is a programming language used for software development, automation, data science and artificial intelligence.",
+    keywords:
+      "python programming coding software language ai"
+  },
 
+  {
+    title: "JavaScript",
+    url:
+      "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+    description:
+      "JavaScript is a programming language widely used for interactive websites and applications.",
+    keywords:
+      "javascript js programming web frontend coding"
+  },
 
-    {
-        title: "JavaScript",
-        url:
-            "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
-        description:
-            "JavaScript is a programming language widely used for interactive websites and applications.",
-        keywords:
-            "javascript js programming web frontend coding"
-    },
+  {
+    title: "HTML",
+    url:
+      "https://developer.mozilla.org/en-US/docs/Web/HTML",
+    description:
+      "HTML is the standard markup language used to create web pages.",
+    keywords:
+      "html website web markup frontend"
+  },
 
+  {
+    title: "CSS",
+    url:
+      "https://developer.mozilla.org/en-US/docs/Web/CSS",
+    description:
+      "CSS is used to style and design websites.",
+    keywords:
+      "css style design website frontend"
+  },
 
-    {
-        title: "HTML",
-        url:
-            "https://developer.mozilla.org/en-US/docs/Web/HTML",
-        description:
-            "HTML is the standard markup language used to create and structure web pages.",
-        keywords:
-            "html website web markup frontend"
-    },
+  {
+    title: "React",
+    url: "https://react.dev/",
+    description:
+      "React is a JavaScript library for building user interfaces.",
+    keywords:
+      "react javascript frontend ui"
+  },
 
+  {
+    title: "GitHub",
+    url: "https://github.com/",
+    description:
+      "GitHub is a platform for hosting and collaborating on software projects.",
+    keywords:
+      "github git code programming repository"
+  },
 
-    {
-        title: "CSS",
-        url:
-            "https://developer.mozilla.org/en-US/docs/Web/CSS",
-        description:
-            "CSS is used to style websites, layouts, colors, fonts and animations.",
-        keywords:
-            "css style styling design website frontend"
-    },
+  {
+    title: "Supabase",
+    url: "https://supabase.com/",
+    description:
+      "Supabase is an open source backend platform powered by PostgreSQL.",
+    keywords:
+      "supabase database postgres backend"
+  },
 
+  {
+    title: "YouTube",
+    url: "https://www.youtube.com/",
+    description:
+      "YouTube is an online video platform.",
+    keywords:
+      "youtube video videos creator"
+  },
 
-    {
-        title: "React",
-        url:
-            "https://react.dev/",
-        description:
-            "React is a JavaScript library for building user interfaces.",
-        keywords:
-            "react javascript frontend ui web development"
-    },
+  {
+    title: "Wikipedia",
+    url: "https://www.wikipedia.org/",
+    description:
+      "Wikipedia is a free online encyclopedia.",
+    keywords:
+      "wikipedia encyclopedia education"
+  },
 
-
-    {
-        title: "Node.js",
-        url:
-            "https://nodejs.org/",
-        description:
-            "Node.js is a JavaScript runtime used to build scalable applications and servers.",
-        keywords:
-            "node nodejs javascript backend server programming"
-    },
-
-
-    {
-        title: "GitHub",
-        url:
-            "https://github.com/",
-        description:
-            "GitHub is a platform for hosting and collaborating on software projects.",
-        keywords:
-            "github git code programming repository developer"
-    },
-
-
-    {
-        title: "Supabase",
-        url:
-            "https://supabase.com/",
-        description:
-            "Supabase is an open source backend platform powered by PostgreSQL.",
-        keywords:
-            "supabase database postgres backend api"
-    },
-
-
-    {
-        title: "Google",
-        url:
-            "https://www.google.com/",
-        description:
-            "Google provides search, cloud computing, software and technology services.",
-        keywords:
-            "google search technology android cloud"
-    },
-
-
-    {
-        title: "YouTube",
-        url:
-            "https://www.youtube.com/",
-        description:
-            "YouTube is an online video platform for watching, uploading and sharing videos.",
-        keywords:
-            "youtube video videos creator entertainment"
-    },
-
-
-    {
-        title: "Wikipedia",
-        url:
-            "https://www.wikipedia.org/",
-        description:
-            "Wikipedia is a free online encyclopedia covering millions of topics.",
-        keywords:
-            "wikipedia encyclopedia information education"
-    },
-
-
-    {
-        title: "বাংলাদেশ",
-        url:
-            "https://bn.wikipedia.org/wiki/বাংলাদেশ",
-        description:
-            "বাংলাদেশ দক্ষিণ এশিয়ার একটি দেশ। এর রাজধানী ঢাকা।",
-        keywords:
-            "বাংলাদেশ bangladesh bangla country দেশ ঢাকা"
-    },
-
-
-    {
-        title: "ঢাকা",
-        url:
-            "https://bn.wikipedia.org/wiki/ঢাকা",
-        description:
-            "ঢাকা বাংলাদেশের রাজধানী এবং অন্যতম প্রধান শহর।",
-        keywords:
-            "ঢাকা dhaka bangladesh capital city"
-    }
+  {
+    title: "Bangladesh",
+    url:
+      "https://en.wikipedia.org/wiki/Bangladesh",
+    description:
+      "Bangladesh is a country in South Asia.",
+    keywords:
+      "bangladesh bangla country dhaka"
+  }
 
 ];
 
 
 /* =========================================================
-   TEXT NORMALIZATION
+   HELPERS
 ========================================================= */
 
 function normalizeText(value) {
 
-    return String(value || "")
-        .normalize("NFKC")
-        .toLocaleLowerCase()
-        .replace(
-            /[\u200B-\u200D\uFEFF]/g,
-            ""
-        )
-        .replace(
-            /\s+/g,
-            " "
-        )
-        .trim();
+  return String(value || "")
+    .normalize("NFKC")
+    .toLocaleLowerCase()
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 }
 
 
-/* =========================================================
-   TOKENIZER
-========================================================= */
-
 function tokenize(value) {
 
-    const text =
-        normalizeText(value);
+  const text =
+    normalizeText(value);
+
+  if (!text) return [];
+
+  return text
+    .split(/[\s\-_.,!?;:()[\]{}'"\/\\|+=*&^%$#@~`<>]+/)
+    .filter(Boolean);
+
+}
 
 
-    if (!text) {
-        return [];
-    }
+function escapeHtml(value) {
+
+  return String(value || "")
+    .replace(
+      /[&<>"']/g,
+      char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]
+    );
+
+}
 
 
-    return text
-        .split(
-            /[\s\-_.,!?;:()[\]{}'"\/\\|+=*&^%$#@~`<>]+/
-        )
-        .filter(Boolean);
+function stripHtml(value) {
+
+  const div =
+    document.createElement("div");
+
+  div.innerHTML =
+    String(value || "");
+
+  return (
+    div.textContent ||
+    div.innerText ||
+    ""
+  );
 
 }
 
@@ -426,67 +334,45 @@ function tokenize(value) {
 
 function searchDemo(query) {
 
-    const words =
-        tokenize(query);
+  const words =
+    tokenize(query);
 
+  if (!words.length) {
+    return [];
+  }
 
-    if (!words.length) {
-        return [];
-    }
+  return demoResults
+    .map(item => {
 
+      const text =
+        normalizeText(
+          `${item.title} ${item.description} ${item.keywords}`
+        );
 
-    return demoResults
-        .map(item => {
+      let score = 0;
 
-            const titleText =
-                normalizeText(item.title);
+      words.forEach(word => {
 
-            const keywordText =
-                normalizeText(item.keywords);
+        if (text.includes(word)) {
+          score++;
+        }
 
-            const descriptionText =
-                normalizeText(item.description);
+      });
 
+      return {
+        ...item,
+        _score: score
+      };
 
-            let matched = 0;
-
-
-            words.forEach(word => {
-
-                if (
-                    titleText.includes(word) ||
-                    keywordText.includes(word) ||
-                    descriptionText.includes(word)
-                ) {
-
-                    matched++;
-
-                }
-
-            });
-
-
-            return {
-                ...item,
-                _matched: matched
-            };
-
-        })
-
-
-        .filter(
-            item =>
-                item._matched === words.length
-        )
-
-
-        .sort(
-            (a, b) =>
-                b._matched - a._matched
-        )
-
-
-        .slice(0, 20);
+    })
+    .filter(item =>
+      item._score > 0
+    )
+    .sort(
+      (a, b) =>
+        b._score - a._score
+    )
+    .slice(0, 20);
 
 }
 
@@ -497,133 +383,57 @@ function searchDemo(query) {
 
 async function searchSupabase(query) {
 
-    if (!supabaseClient) {
-        return null;
+  if (!supabaseClient) {
+    return null;
+  }
+
+  try {
+
+    const table =
+      cfg.SEARCH_TABLE ||
+      "search_documents";
+
+    const safeQuery =
+      String(query || "")
+        .replace(/[%_]/g, "\\$&")
+        .replace(/,/g, "\\,")
+        .replace(/\(/g, "\\(")
+        .replace(/\)/g, "\\)");
+
+    const { data, error } =
+      await supabaseClient
+        .from(table)
+        .select(
+          "title,url,description,keywords"
+        )
+        .or(
+          `title.ilike.%${safeQuery}%,description.ilike.%${safeQuery}%,keywords.ilike.%${safeQuery}%`
+        )
+        .limit(30);
+
+    if (error) {
+
+      console.warn(
+        "Supabase search:",
+        error.message
+      );
+
+      return null;
     }
 
+    return Array.isArray(data)
+      ? data
+      : [];
 
-    try {
+  } catch (error) {
 
-        const table =
-            cfg.SEARCH_TABLE ||
-            "search_documents";
+    console.warn(
+      "Supabase request:",
+      error
+    );
 
-
-        const safeQuery =
-            String(query || "")
-                .replace(
-                    /[%_]/g,
-                    "\\$&"
-                )
-                .replace(
-                    /,/g,
-                    "\\,"
-                )
-                .replace(
-                    /\(/g,
-                    "\\("
-                )
-                .replace(
-                    /\)/g,
-                    "\\)"
-                );
-
-
-        const { data, error } =
-            await supabaseClient
-                .from(table)
-                .select(
-                    "title,url,description,keywords"
-                )
-                .or(
-                    `title.ilike.%${safeQuery}%,description.ilike.%${safeQuery}%,keywords.ilike.%${safeQuery}%`
-                )
-                .limit(30);
-
-
-        if (error) {
-
-            console.warn(
-                "Supabase search error:",
-                error.message
-            );
-
-            return null;
-
-        }
-
-
-        return Array.isArray(data)
-            ? data
-            : [];
-
-    } catch (error) {
-
-        console.warn(
-            "Supabase request failed:",
-            error
-        );
-
-        return null;
-
-    }
-
-}
-
-
-/* =========================================================
-   DIRECT URL
-========================================================= */
-
-function isUrl(text) {
-
-    try {
-
-        const url =
-            new URL(text);
-
-
-        return (
-            url.protocol === "http:" ||
-            url.protocol === "https:"
-        );
-
-    } catch {
-
-        return false;
-
-    }
-
-}
-
-
-/* =========================================================
-   URL RESULT
-========================================================= */
-
-function createUrlResult(url) {
-
-    let host = url;
-
-
-    try {
-
-        host =
-            new URL(url).hostname;
-
-    } catch {}
-
-
-    return [{
-
-        title: host,
-
-        url: url,
-
-        description:
-            "Open this website directly from Rise From Broken."
-
-    }];
+    return null;
+  }
 
 }
 
@@ -634,422 +444,288 @@ function createUrlResult(url) {
 
 async function searchWikipedia(query) {
 
-    try {
+  try {
 
-        const api =
-            "https://en.wikipedia.org/w/api.php" +
-            "?action=query" +
-            "&list=search" +
-            "&srsearch=" +
-            encodeURIComponent(query) +
-            "&format=json" +
-            "&origin=*" +
-            "&srlimit=15";
+    const api =
+      "https://en.wikipedia.org/w/api.php" +
+      "?action=query" +
+      "&list=search" +
+      "&srsearch=" +
+      encodeURIComponent(query) +
+      "&format=json" +
+      "&origin=*" +
+      "&srlimit=15";
 
+    const response =
+      await fetch(api);
 
-        const response =
-            await fetch(api);
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Wikipedia API failed"
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        if (
-            !data.query ||
-            !Array.isArray(
-                data.query.search
-            )
-        ) {
-
-            return [];
-
-        }
-
-
-        return data.query.search.map(
-            item => ({
-
-                title:
-                    item.title,
-
-                url:
-                    "https://en.wikipedia.org/wiki/" +
-                    encodeURIComponent(
-                        item.title.replace(
-                            / /g,
-                            "_"
-                        )
-                    ),
-
-                description:
-                    stripHtml(
-                        item.snippet
-                    ) + "..."
-
-            })
-        );
-
-    } catch (error) {
-
-        console.warn(
-            "Wikipedia error:",
-            error
-        );
-
-        return [];
-
+    if (!response.ok) {
+      return [];
     }
+
+    const data =
+      await response.json();
+
+    if (
+      !data.query ||
+      !Array.isArray(data.query.search)
+    ) {
+      return [];
+    }
+
+    return data.query.search.map(item => ({
+
+      title: item.title,
+
+      url:
+        "https://en.wikipedia.org/wiki/" +
+        encodeURIComponent(
+          item.title.replace(/ /g, "_")
+        ),
+
+      description:
+        stripHtml(item.snippet) + "..."
+
+    }));
+
+  } catch {
+
+    return [];
+  }
 
 }
 
 
 /* =========================================================
-   WIKIMEDIA IMAGES
+   IMAGES
 ========================================================= */
 
 async function searchImages(query) {
 
-    try {
+  try {
 
-        const api =
-            "https://commons.wikimedia.org/w/api.php" +
-            "?action=query" +
-            "&generator=search" +
-            "&gsrsearch=" +
-            encodeURIComponent(query) +
-            "&gsrnamespace=6" +
-            "&gsrlimit=30" +
-            "&prop=imageinfo" +
-            "&iiprop=url|mime" +
-            "&iiurlwidth=600" +
-            "&format=json" +
-            "&origin=*";
+    const api =
+      "https://commons.wikimedia.org/w/api.php" +
+      "?action=query" +
+      "&generator=search" +
+      "&gsrsearch=" +
+      encodeURIComponent(query) +
+      "&gsrnamespace=6" +
+      "&gsrlimit=30" +
+      "&prop=imageinfo" +
+      "&iiprop=url|mime" +
+      "&iiurlwidth=600" +
+      "&format=json" +
+      "&origin=*";
 
+    const response =
+      await fetch(api);
 
-        const response =
-            await fetch(api);
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Wikimedia image API failed"
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        if (!data.query?.pages) {
-            return [];
-        }
-
-
-        return Object.values(
-            data.query.pages
-        )
-
-
-        .map(page => {
-
-            const info =
-                page.imageinfo?.[0];
-
-
-            if (!info) {
-                return null;
-            }
-
-
-            const mime =
-                String(
-                    info.mime || ""
-                ).toLowerCase();
-
-
-            if (
-                !mime.startsWith(
-                    "image/"
-                )
-            ) {
-
-                return null;
-
-            }
-
-
-            return {
-
-                title:
-                    String(
-                        page.title || ""
-                    ).replace(
-                        /^File:/i,
-                        ""
-                    ),
-
-                image:
-                    info.thumburl ||
-                    info.url ||
-                    "",
-
-                url:
-                    info.descriptionurl ||
-                    info.url ||
-                    "#"
-
-            };
-
-        })
-
-
-        .filter(
-            item =>
-                item &&
-                item.image
-        )
-
-
-        .slice(0, 20);
-
-    } catch (error) {
-
-        console.warn(
-            "Image search error:",
-            error
-        );
-
-        return [];
-
+    if (!response.ok) {
+      return [];
     }
+
+    const data =
+      await response.json();
+
+    if (!data.query?.pages) {
+      return [];
+    }
+
+    return Object.values(
+      data.query.pages
+    )
+      .map(page => {
+
+        const info =
+          page.imageinfo?.[0];
+
+        if (!info) return null;
+
+        const mime =
+          String(info.mime || "")
+            .toLowerCase();
+
+        if (!mime.startsWith("image/")) {
+          return null;
+        }
+
+        return {
+
+          title:
+            String(page.title || "")
+              .replace(/^File:/i, ""),
+
+          image:
+            info.thumburl ||
+            info.url ||
+            "",
+
+          url:
+            info.descriptionurl ||
+            info.url ||
+            "#"
+
+        };
+
+      })
+      .filter(Boolean)
+      .slice(0, 20);
+
+  } catch {
+
+    return [];
+  }
 
 }
 
 
 /* =========================================================
-   WIKIMEDIA VIDEOS
+   VIDEOS
 ========================================================= */
 
 async function searchVideos(query) {
 
-    try {
+  try {
 
-        const api =
-            "https://commons.wikimedia.org/w/api.php" +
-            "?action=query" +
-            "&generator=search" +
-            "&gsrsearch=" +
-            encodeURIComponent(query) +
-            "&gsrnamespace=6" +
-            "&gsrlimit=60" +
-            "&prop=imageinfo" +
-            "&iiprop=url|mime" +
-            "&iiurlwidth=600" +
-            "&format=json" +
-            "&origin=*";
+    const api =
+      "https://commons.wikimedia.org/w/api.php" +
+      "?action=query" +
+      "&generator=search" +
+      "&gsrsearch=" +
+      encodeURIComponent(query) +
+      "&gsrnamespace=6" +
+      "&gsrlimit=60" +
+      "&prop=imageinfo" +
+      "&iiprop=url|mime" +
+      "&iiurlwidth=600" +
+      "&format=json" +
+      "&origin=*";
 
+    const response =
+      await fetch(api);
 
-        const response =
-            await fetch(api);
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Wikimedia video API failed"
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        if (!data.query?.pages) {
-            return [];
-        }
-
-
-        return Object.values(
-            data.query.pages
-        )
-
-
-        .map(page => {
-
-            const info =
-                page.imageinfo?.[0];
-
-
-            if (!info) {
-                return null;
-            }
-
-
-            const mime =
-                String(
-                    info.mime || ""
-                ).toLowerCase();
-
-
-            if (
-                !mime.startsWith(
-                    "video/"
-                )
-            ) {
-
-                return null;
-
-            }
-
-
-            return {
-
-                title:
-                    String(
-                        page.title || ""
-                    ).replace(
-                        /^File:/i,
-                        ""
-                    ),
-
-                thumbnail:
-                    info.thumburl || "",
-
-                url:
-                    info.descriptionurl ||
-                    info.url ||
-                    "#",
-
-                videoUrl:
-                    info.url || ""
-
-            };
-
-        })
-
-
-        .filter(Boolean)
-        .slice(0, 20);
-
-    } catch (error) {
-
-        console.warn(
-            "Video search error:",
-            error
-        );
-
-        return [];
-
+    if (!response.ok) {
+      return [];
     }
+
+    const data =
+      await response.json();
+
+    if (!data.query?.pages) {
+      return [];
+    }
+
+    return Object.values(
+      data.query.pages
+    )
+      .map(page => {
+
+        const info =
+          page.imageinfo?.[0];
+
+        if (!info) return null;
+
+        const mime =
+          String(info.mime || "")
+            .toLowerCase();
+
+        if (!mime.startsWith("video/")) {
+          return null;
+        }
+
+        return {
+
+          title:
+            String(page.title || "")
+              .replace(/^File:/i, ""),
+
+          thumbnail:
+            info.thumburl || "",
+
+          url:
+            info.descriptionurl ||
+            info.url ||
+            "#"
+
+        };
+
+      })
+      .filter(Boolean)
+      .slice(0, 20);
+
+  } catch {
+
+    return [];
+  }
 
 }
 
 
 /* =========================================================
-   GOOGLE NEWS
+   NEWS
 ========================================================= */
 
 async function searchNews(query) {
 
-    try {
+  try {
 
-        const rss =
-            "https://news.google.com/rss/search?q=" +
-            encodeURIComponent(query) +
-            "&hl=en-US&gl=US&ceid=US:en";
+    const rss =
+      "https://news.google.com/rss/search?q=" +
+      encodeURIComponent(query) +
+      "&hl=en-US&gl=US&ceid=US:en";
 
+    const proxy =
+      "https://api.allorigins.win/raw?url=" +
+      encodeURIComponent(rss);
 
-        const proxy =
-            "https://api.allorigins.win/raw?url=" +
-            encodeURIComponent(rss);
+    const response =
+      await fetch(proxy);
 
-
-        const response =
-            await fetch(proxy);
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "News API failed"
-            );
-
-        }
-
-
-        const text =
-            await response.text();
-
-
-        const parser =
-            new DOMParser();
-
-
-        const xml =
-            parser.parseFromString(
-                text,
-                "text/xml"
-            );
-
-
-        return [
-            ...xml.querySelectorAll("item")
-        ]
-
-
-        .slice(0, 20)
-
-
-        .map(item => ({
-
-            title:
-                item.querySelector(
-                    "title"
-                )?.textContent || "",
-
-            url:
-                item.querySelector(
-                    "link"
-                )?.textContent || "#",
-
-            description:
-                item.querySelector(
-                    "description"
-                )?.textContent || "",
-
-            source:
-                item.querySelector(
-                    "source"
-                )?.textContent ||
-                "News"
-
-        }));
-
-    } catch (error) {
-
-        console.warn(
-            "News search error:",
-            error
-        );
-
-        return [];
-
+    if (!response.ok) {
+      return [];
     }
+
+    const text =
+      await response.text();
+
+    const parser =
+      new DOMParser();
+
+    const xml =
+      parser.parseFromString(
+        text,
+        "text/xml"
+      );
+
+    return [
+      ...xml.querySelectorAll("item")
+    ]
+      .slice(0, 20)
+      .map(item => ({
+
+        title:
+          item.querySelector("title")
+            ?.textContent || "",
+
+        url:
+          item.querySelector("link")
+            ?.textContent || "#",
+
+        description:
+          item.querySelector("description")
+            ?.textContent || "",
+
+        source:
+          item.querySelector("source")
+            ?.textContent || "News"
+
+      }));
+
+  } catch {
+
+    return [];
+  }
 
 }
 
@@ -1060,324 +736,192 @@ async function searchNews(query) {
 
 async function askRfb(question) {
 
-    const response =
-        await fetch(
-            "/api/ask",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body:
-                    JSON.stringify({
-                        question
-                    })
-            }
-        );
-
-
-    let data = null;
-
-
-    try {
-
-        data =
-            await response.json();
-
-    } catch {
-
-        data = null;
-
-    }
-
-
-    if (!response.ok) {
-
-        throw new Error(
-            data?.error ||
-            "RFB Ask request failed."
-        );
-
-    }
-
-
-    return data || {};
-
-}
-
-
-/* =========================================================
-   RFB ASK — ONE LINE WEB SUMMARY
-========================================================= */
-
-async function loadRfbWebAnswer(
-    question
-) {
-
-    if (!rfbWebAnswer) {
-        return;
-    }
-
-
-    rfbWebAnswer.hidden = false;
-
-
-    if (rfbWebAnswerText) {
-
-        rfbWebAnswerText.textContent =
-            "RFB Ask is analyzing the web results...";
-
-    }
-
-
-    if (rfbWebSources) {
-
-        rfbWebSources.innerHTML = "";
-
-    }
-
-
-    try {
-
-        const data =
-            await askRfb(question);
-
-
-        const answer =
-            String(
-                data.answer || ""
-            ).trim();
-
-
-        if (rfbWebAnswerText) {
-
-            if (answer) {
-
-                /*
-                  Keep only the first useful line
-                  for the All page.
-                */
-
-                const firstLine =
-                    answer
-                        .split(/\n+/)
-                        .map(
-                            line =>
-                                line.trim()
-                        )
-                        .find(Boolean) ||
-                    answer;
-
-
-                rfbWebAnswerText.textContent =
-                    firstLine;
-
-            } else {
-
-                rfbWebAnswerText.textContent =
-                    "No AI explanation available.";
-
-            }
-
-        }
-
-
-        renderRfbWebSources(
-            data.sources || []
-        );
-
-    } catch (error) {
-
-        console.warn(
-            "RFB web answer error:",
-            error
-        );
-
-
-        if (rfbWebAnswerText) {
-
-            rfbWebAnswerText.textContent =
-                "RFB Ask explanation is temporarily unavailable.";
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   RFB WEB SOURCES
-========================================================= */
-
-function renderRfbWebSources(
-    sources
-) {
-
-    if (!rfbWebSources) {
-        return;
-    }
-
-
-    rfbWebSources.innerHTML = "";
-
-
-    if (
-        !Array.isArray(sources) ||
-        !sources.length
-    ) {
-
-        return;
-
-    }
-
-
-    const title =
-        document.createElement("div");
-
-
-    title.className =
-        "rfb-web-sources-title";
-
-
-    title.textContent =
-        "Web sources";
-
-
-    rfbWebSources.appendChild(
-        title
+  const response =
+    await fetch(
+      "/api/ask",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          question
+        })
+      }
     );
 
+  let data = {};
 
-    sources
-        .slice(0, 5)
-        .forEach(source => {
+  try {
+    data = await response.json();
+  } catch {}
 
-            if (!source?.url) {
-                return;
-            }
+  if (!response.ok) {
 
+    throw new Error(
+      data.error ||
+      `RFB Ask failed (${response.status})`
+    );
 
-            const link =
-                document.createElement("a");
+  }
 
-
-            link.href =
-                source.url;
-
-
-            link.target =
-                "_blank";
-
-
-            link.rel =
-                "noopener noreferrer";
-
-
-            link.className =
-                "rfb-web-source";
-
-
-            link.textContent =
-                source.title ||
-                source.url;
-
-
-            rfbWebSources.appendChild(
-                link
-            );
-
-        });
+  return (
+    data.answer ||
+    data.message ||
+    "RFB could not generate an answer."
+  );
 
 }
 
 
 /* =========================================================
-   RENDER WEB RESULTS
+   INLINE ASK
+========================================================= */
+
+async function runInlineAsk(query) {
+
+  if (!inlineAsk || !inlineAskText) {
+    return;
+  }
+
+  inlineAsk.hidden = false;
+
+  inlineAskText.textContent =
+    "Getting a quick explanation...";
+
+  try {
+
+    const answer =
+      await askRfb(query);
+
+    inlineAskText.textContent =
+      answer;
+
+  } catch (error) {
+
+    console.warn(
+      "Inline RFB Ask:",
+      error
+    );
+
+    inlineAskText.textContent =
+      "RFB Ask is temporarily unavailable.";
+
+  }
+
+}
+
+
+/* =========================================================
+   RFB ASK PANEL
+========================================================= */
+
+async function runAskPanel(question) {
+
+  question =
+    String(question || "").trim();
+
+  if (!question) {
+    return;
+  }
+
+  rfbAskButton.disabled = true;
+
+  rfbAskLoading.hidden = false;
+
+  rfbAskAnswer.hidden = true;
+
+  try {
+
+    const answer =
+      await askRfb(question);
+
+    rfbAskAnswer.textContent =
+      answer;
+
+    rfbAskAnswer.hidden = false;
+
+  } catch (error) {
+
+    rfbAskAnswer.textContent =
+      "⚠️ " +
+      error.message;
+
+    rfbAskAnswer.hidden = false;
+
+  } finally {
+
+    rfbAskButton.disabled = false;
+
+    rfbAskLoading.hidden = true;
+
+  }
+
+}
+
+
+/* =========================================================
+   RENDER WEB
 ========================================================= */
 
 function renderWebResults(data) {
 
-    results.innerHTML = "";
+  results.innerHTML = "";
 
+  resultCount.textContent =
+    `${data.length} result${data.length === 1 ? "" : "s"}`;
 
-    count.textContent =
-        `${data.length} result${
-            data.length === 1
-                ? ""
-                : "s"
-        }`;
+  emptyState.hidden =
+    data.length !== 0;
 
+  if (!data.length) {
+    return;
+  }
 
-    if (!data.length) {
+  data.forEach(item => {
 
-        renderEmpty(
-            "No results found."
-        );
+    const card =
+      document.createElement("a");
 
-        return;
+    card.className =
+      "result";
 
-    }
+    card.href =
+      item.url || "#";
 
+    card.target =
+      "_blank";
 
-    emptyState.hidden = true;
+    card.rel =
+      "noopener noreferrer";
 
+    card.innerHTML = `
 
-    data.forEach(item => {
+      <div class="result-url">
+        ${escapeHtml(item.url || "")}
+      </div>
 
-        const card =
-            document.createElement("a");
+      <h3>
+        ${escapeHtml(
+          item.title || "Untitled"
+        )}
+      </h3>
 
+      <p>
+        ${escapeHtml(
+          item.description ||
+          "No description available."
+        )}
+      </p>
 
-        card.className =
-            "result";
+    `;
 
+    results.appendChild(card);
 
-        card.href =
-            item.url || "#";
-
-
-        card.target =
-            "_blank";
-
-
-        card.rel =
-            "noopener noreferrer";
-
-
-        card.innerHTML = `
-
-          <div class="result-url">
-            ${escapeHtml(
-                item.url || ""
-            )}
-          </div>
-
-          <h3>
-            ${escapeHtml(
-                item.title ||
-                "Untitled"
-            )}
-          </h3>
-
-          <p>
-            ${escapeHtml(
-                item.description ||
-                "No description available."
-            )}
-          </p>
-
-        `;
-
-
-        results.appendChild(
-            card
-        );
-
-    });
+  });
 
 }
 
@@ -1388,99 +932,62 @@ function renderWebResults(data) {
 
 function renderImages(data) {
 
-    results.innerHTML = "";
+  results.innerHTML = "";
 
+  resultCount.textContent =
+    `${data.length} image${data.length === 1 ? "" : "s"}`;
 
-    count.textContent =
-        `${data.length} image${
-            data.length === 1
-                ? ""
-                : "s"
-        }`;
+  if (!data.length) {
 
+    emptyState.hidden = false;
 
-    if (!data.length) {
+    return;
+  }
 
-        renderEmpty(
-            "No images found."
-        );
+  emptyState.hidden = true;
 
-        return;
+  const grid =
+    document.createElement("div");
 
-    }
+  grid.className =
+    "images-grid";
 
+  data.forEach(item => {
 
-    emptyState.hidden = true;
+    const card =
+      document.createElement("a");
 
+    card.className =
+      "image-card";
 
-    const grid =
-        document.createElement("div");
+    card.href =
+      item.url || "#";
 
+    card.target =
+      "_blank";
 
-    grid.className =
-        "images-grid";
+    card.rel =
+      "noopener noreferrer";
 
+    card.innerHTML = `
 
-    data.forEach(item => {
+      <img
+        src="${escapeHtml(item.image)}"
+        alt="${escapeHtml(item.title)}"
+        loading="lazy"
+      >
 
-        const card =
-            document.createElement("a");
+      <div class="image-card-content">
+        ${escapeHtml(item.title)}
+      </div>
 
+    `;
 
-        card.className =
-            "image-card";
+    grid.appendChild(card);
 
+  });
 
-        card.href =
-            item.url || "#";
-
-
-        card.target =
-            "_blank";
-
-
-        card.rel =
-            "noopener noreferrer";
-
-
-        card.innerHTML = `
-
-          <img
-            src="${escapeHtml(
-                item.image
-            )}"
-            alt="${escapeHtml(
-                item.title
-            )}"
-            loading="lazy"
-            onerror="
-              this.style.display='none'
-            "
-          >
-
-          <div class="image-card-content">
-
-            <div class="image-card-title">
-              ${escapeHtml(
-                  item.title
-              )}
-            </div>
-
-          </div>
-
-        `;
-
-
-        grid.appendChild(
-            card
-        );
-
-    });
-
-
-    results.appendChild(
-        grid
-    );
+  results.appendChild(grid);
 
 }
 
@@ -1491,117 +998,78 @@ function renderImages(data) {
 
 function renderVideos(data) {
 
-    results.innerHTML = "";
+  results.innerHTML = "";
 
+  resultCount.textContent =
+    `${data.length} video${data.length === 1 ? "" : "s"}`;
 
-    count.textContent =
-        `${data.length} video${
-            data.length === 1
-                ? ""
-                : "s"
-        }`;
+  if (!data.length) {
 
+    emptyState.hidden = false;
 
-    if (!data.length) {
+    return;
+  }
 
-        renderEmpty(
-            "No videos found."
-        );
+  emptyState.hidden = true;
 
-        return;
+  const grid =
+    document.createElement("div");
 
-    }
+  grid.className =
+    "videos-grid";
 
+  data.forEach(item => {
 
-    emptyState.hidden = true;
+    const card =
+      document.createElement("a");
 
+    card.className =
+      "video-card";
 
-    const grid =
-        document.createElement("div");
+    card.href =
+      item.url || "#";
 
+    card.target =
+      "_blank";
 
-    grid.className =
-        "videos-grid";
+    card.rel =
+      "noopener noreferrer";
 
+    card.innerHTML = `
 
-    data.forEach(item => {
+      <div class="video-thumbnail">
 
-        const card =
-            document.createElement("a");
+        ${
+          item.thumbnail
+          ?
+          `<img
+             src="${escapeHtml(item.thumbnail)}"
+             alt="${escapeHtml(item.title)}"
+             loading="lazy"
+           >`
+          :
+          `<div class="video-placeholder">
+             🎬
+           </div>`
+        }
 
+        <div class="video-play">
+          ▶
+        </div>
 
-        card.className =
-            "video-card";
+      </div>
 
+      <div class="video-card-content">
+        ${escapeHtml(item.title)}
+      </div>
 
-        card.href =
-            item.url || "#";
+    `;
 
+    grid.appendChild(card);
 
-        card.target =
-            "_blank";
+  });
 
-
-        card.rel =
-            "noopener noreferrer";
-
-
-        card.innerHTML = `
-
-          <div class="video-thumbnail">
-
-            ${
-                item.thumbnail
-                    ?
-                `
-                <img
-                  src="${escapeHtml(
-                      item.thumbnail
-                  )}"
-                  alt="${escapeHtml(
-                      item.title
-                  )}"
-                  loading="lazy"
-                >
-                `
-                    :
-                `
-                <div class="video-placeholder">
-                  🎬
-                </div>
-                `
-            }
-
-            <div class="video-play">
-              ▶
-            </div>
-
-          </div>
-
-
-          <div class="video-card-content">
-
-            <div class="video-card-title">
-              ${escapeHtml(
-                  item.title
-              )}
-            </div>
-
-          </div>
-
-        `;
-
-
-        grid.appendChild(
-            card
-        );
-
-    });
-
-
-    results.appendChild(
-        grid
-    );
+  results.appendChild(grid);
 
 }
 
@@ -1612,102 +1080,76 @@ function renderVideos(data) {
 
 function renderNews(data) {
 
-    results.innerHTML = "";
+  results.innerHTML = "";
 
+  resultCount.textContent =
+    `${data.length} news result${data.length === 1 ? "" : "s"}`;
 
-    count.textContent =
-        `${data.length} news result${
-            data.length === 1
-                ? ""
-                : "s"
-        }`;
+  if (!data.length) {
 
+    emptyState.hidden = false;
 
-    if (!data.length) {
+    return;
+  }
 
-        renderEmpty(
-            "No news found."
-        );
+  emptyState.hidden = true;
 
-        return;
+  const list =
+    document.createElement("div");
 
-    }
+  list.className =
+    "news-list";
 
+  data.forEach(item => {
 
-    emptyState.hidden = true;
+    const card =
+      document.createElement("a");
 
+    card.className =
+      "news-card";
 
-    const list =
-        document.createElement("div");
+    card.href =
+      item.url || "#";
 
+    card.target =
+      "_blank";
 
-    list.className =
-        "news-list";
+    card.rel =
+      "noopener noreferrer";
 
+    card.innerHTML = `
 
-    data.forEach(item => {
+      <div class="news-content">
 
-        const card =
-            document.createElement("a");
+        <div class="news-source">
+          ${escapeHtml(
+            item.source || "News"
+          )}
+        </div>
 
+        <div class="news-title">
+          ${escapeHtml(
+            item.title || "Untitled"
+          )}
+        </div>
 
-        card.className =
-            "news-card";
+        <div class="news-description">
+          ${escapeHtml(
+            stripHtml(
+              item.description
+            )
+          )}
+        </div>
 
+      </div>
 
-        card.href =
-            item.url || "#";
+    `;
 
+    list.appendChild(card);
 
-        card.target =
-            "_blank";
+  });
 
-
-        card.rel =
-            "noopener noreferrer";
-
-
-        card.innerHTML = `
-
-          <div class="news-content">
-
-            <div class="news-source">
-              ${escapeHtml(
-                  item.source ||
-                  "News"
-              )}
-            </div>
-
-            <div class="news-title">
-              ${escapeHtml(
-                  item.title ||
-                  "Untitled"
-              )}
-            </div>
-
-            <div class="news-description">
-              ${escapeHtml(
-                  stripHtml(
-                      item.description
-                  )
-              )}
-            </div>
-
-          </div>
-
-        `;
-
-
-        list.appendChild(
-            card
-        );
-
-    });
-
-
-    results.appendChild(
-        list
-    );
+  results.appendChild(list);
 
 }
 
@@ -1716,174 +1158,51 @@ function renderNews(data) {
    EMPTY
 ========================================================= */
 
-function renderEmpty(message) {
+function showEmpty(message) {
 
-    results.innerHTML = "";
+  results.innerHTML = "";
 
+  emptyState.innerHTML = `
 
-    emptyState.innerHTML = `
+    <div class="empty-mark">
+      ⌕
+    </div>
 
-      <div class="empty-mark">
-        ⌕
-      </div>
+    <h3>
+      ${escapeHtml(message)}
+    </h3>
 
-      <h3>
-        ${escapeHtml(
-            message
-        )}
-      </h3>
+    <p>
+      Try another search.
+    </p>
 
-      <p>
-        Try another search.
-      </p>
+  `;
 
-    `;
+  emptyState.hidden = false;
 
-
-    emptyState.hidden = false;
-
-
-    count.textContent =
-        "0 results";
+  resultCount.textContent =
+    "0 results";
 
 }
 
 
 /* =========================================================
-   HIDE RFB WEB ANSWER
+   SET TAB
 ========================================================= */
 
-function hideRfbWebAnswer() {
+function setActiveTab(tabName) {
 
-    if (!rfbWebAnswer) {
-        return;
-    }
+  tabs.forEach(tab => {
 
+    const active =
+      tab.dataset.tab === tabName;
 
-    rfbWebAnswer.hidden = true;
+    tab.classList.toggle(
+      "active",
+      active
+    );
 
-
-    if (rfbWebAnswerText) {
-
-        rfbWebAnswerText.textContent =
-            "";
-
-    }
-
-
-    if (rfbWebSources) {
-
-        rfbWebSources.innerHTML =
-            "";
-
-    }
-
-}
-
-
-/* =========================================================
-   SHOW NORMAL SEARCH
-========================================================= */
-
-function showNormalSearch() {
-
-    if (resultsSection) {
-        resultsSection.hidden = false;
-    }
-
-
-    if (rfbAskSection) {
-        rfbAskSection.hidden = true;
-    }
-
-
-    if (rfbWebAnswer) {
-
-        /*
-          Only All tab uses the
-          RFB web explanation.
-        */
-
-        rfbWebAnswer.hidden =
-            currentTab !== "all";
-
-    }
-
-}
-
-
-/* =========================================================
-   SHOW RFB ASK
-========================================================= */
-
-function showRfbAsk() {
-
-    if (resultsSection) {
-        resultsSection.hidden = false;
-    }
-
-
-    if (rfbAskSection) {
-
-        rfbAskSection.hidden =
-            false;
-
-    }
-
-
-    if (rfbWebAnswer) {
-
-        rfbWebAnswer.hidden =
-            true;
-
-    }
-
-
-    if (results) {
-
-        results.innerHTML =
-            "";
-
-    }
-
-
-    if (emptyState) {
-
-        emptyState.hidden =
-            true;
-
-    }
-
-
-    if (count) {
-
-        count.textContent =
-            "";
-
-    }
-
-
-    if (title) {
-
-        title.textContent =
-            "Ask RFB Ask";
-
-    }
-
-
-    /*
-      Put focus directly in AI box.
-    */
-
-    if (rfbAiInput) {
-
-        setTimeout(
-            () =>
-                rfbAiInput.focus(),
-            100
-        );
-
-    }
+  });
 
 }
 
@@ -1893,522 +1212,191 @@ function showRfbAsk() {
 ========================================================= */
 
 async function runSearch(
-    query,
-    tab = currentTab
+  query,
+  tab = "all"
 ) {
 
-    query =
-        String(query || "").trim();
+  query =
+    String(query || "").trim();
 
+  if (!query) {
+    return;
+  }
 
-    if (!query) {
-        return;
-    }
+  currentQuery = query;
+  currentTab = tab;
 
+  input.value = query;
 
-    currentQuery =
-        query;
+  clearBtn.hidden = false;
 
+  resultsSection.hidden = false;
 
-    currentTab =
-        tab;
+  homeInfo.hidden = true;
 
+  setActiveTab(tab);
 
-    historyPush(
-        query
-    );
+  resultsTitle.textContent =
+    query;
 
+  results.innerHTML = "";
+
+  emptyState.hidden = true;
+
+  inlineAsk.hidden = true;
+
+  loadingState.hidden = false;
+
+  resultCount.textContent =
+    "Searching...";
+
+  try {
 
     /* =====================================================
        RFB ASK TAB
-    ====================================================== */
+    ===================================================== */
 
     if (tab === "ask") {
 
-        showRfbAsk();
+      rfbAskPanel.hidden = false;
 
-        return;
+      results.innerHTML = "";
 
+      resultCount.textContent =
+        "AI answer";
+
+      await runAskPanel(query);
+
+      return;
+    }
+
+
+    rfbAskPanel.hidden = true;
+
+
+    /* =====================================================
+       INLINE AI + ALL
+    ===================================================== */
+
+    if (tab === "all") {
+
+      runInlineAsk(query);
+
+      let data =
+        await searchSupabase(query);
+
+      if (
+        data === null ||
+        !Array.isArray(data) ||
+        data.length === 0
+      ) {
+
+        data =
+          searchDemo(query);
+
+      }
+
+      if (
+        !data.length
+      ) {
+
+        data =
+          await searchWikipedia(query);
+
+      }
+
+      renderWebResults(
+        data || []
+      );
+
+      return;
     }
 
 
     /* =====================================================
-       NORMAL SEARCH
-    ====================================================== */
+       IMAGES
+    ===================================================== */
 
-    showNormalSearch();
+    if (tab === "images") {
 
+      const data =
+        await searchImages(query);
 
-    if (rfbAskSection) {
+      renderImages(data);
 
-        rfbAskSection.hidden =
-            true;
-
+      return;
     }
 
 
-    resultsSection.hidden =
-        false;
+    /* =====================================================
+       VIDEOS
+    ===================================================== */
 
+    if (tab === "videos") {
 
-    emptyState.hidden =
-        true;
+      const data =
+        await searchVideos(query);
 
+      renderVideos(data);
 
-    title.textContent =
-        query;
-
-
-    count.textContent =
-        "Searching...";
-
-
-    results.innerHTML =
-        "";
-
-
-    if (loadingState) {
-
-        loadingState.hidden =
-            false;
-
+      return;
     }
 
 
-    try {
+    /* =====================================================
+       NEWS
+    ===================================================== */
 
-        /* =================================================
-           DIRECT URL
-        ================================================= */
+    if (tab === "news") {
 
-        if (
-            tab === "all" &&
-            isUrl(query)
-        ) {
+      const data =
+        await searchNews(query);
 
-            hideRfbWebAnswer();
+      renderNews(data);
 
-
-            renderWebResults(
-                createUrlResult(
-                    query
-                )
-            );
-
-
-            return;
-
-        }
-
-
-        /* =================================================
-           IMAGES
-        ================================================= */
-
-        if (tab === "images") {
-
-            hideRfbWebAnswer();
-
-
-            const data =
-                await searchImages(
-                    query
-                );
-
-
-            renderImages(
-                data
-            );
-
-
-            return;
-
-        }
-
-
-        /* =================================================
-           VIDEOS
-        ================================================= */
-
-        if (tab === "videos") {
-
-            hideRfbWebAnswer();
-
-
-            const data =
-                await searchVideos(
-                    query
-                );
-
-
-            renderVideos(
-                data
-            );
-
-
-            return;
-
-        }
-
-
-        /* =================================================
-           NEWS
-        ================================================= */
-
-        if (tab === "news") {
-
-            hideRfbWebAnswer();
-
-
-            const data =
-                await searchNews(
-                    query
-                );
-
-
-            renderNews(
-                data
-            );
-
-
-            return;
-
-        }
-
-
-        /* =================================================
-           ALL / WEB
-        ================================================= */
-
-        let data =
-            await searchSupabase(
-                query
-            );
-
-
-        /* Supabase unavailable */
-
-        if (data === null) {
-
-            data =
-                searchDemo(
-                    query
-                );
-
-        }
-
-
-        /* Supabase empty */
-
-        if (
-            Array.isArray(data) &&
-            data.length === 0
-        ) {
-
-            data =
-                searchDemo(
-                    query
-                );
-
-        }
-
-
-        /* Wikipedia fallback */
-
-        if (
-            Array.isArray(data) &&
-            data.length === 0
-        ) {
-
-            data =
-                await searchWikipedia(
-                    query
-                );
-
-        }
-
-
-        renderWebResults(
-            data || []
-        );
-
-
-        /*
-          IMPORTANT:
-
-          Web result render হওয়ার পর
-          RFB Ask background-এ 1-line
-          explanation তৈরি করবে।
-
-          এতে search result আটকে থাকবে না।
-        */
-
-        if (
-            Array.isArray(data) &&
-            data.length
-        ) {
-
-            loadRfbWebAnswer(
-                query
-            );
-
-        } else {
-
-            hideRfbWebAnswer();
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Search error:",
-            error
-        );
-
-
-        renderEmpty(
-            "Search failed. Please try again."
-        );
-
-    } finally {
-
-        if (loadingState) {
-
-            loadingState.hidden =
-                true;
-
-        }
-
+      return;
     }
 
+  } catch (error) {
 
-    resultsSection.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
+    console.error(
+      "RFB Search Error:",
+      error
+    );
+
+    showEmpty(
+      "Search failed. Please try again."
+    );
+
+  } finally {
+
+    loadingState.hidden =
+      true;
+
+  }
 
 }
 
 
 /* =========================================================
-   RFB ASK — DIRECT QUESTION
+   FORM
 ========================================================= */
 
-async function submitRfbAsk() {
-
-    if (!rfbAiInput) {
-        return;
-    }
-
-
-    const question =
-        rfbAiInput.value.trim();
-
-
-    if (!question) {
-        return;
-    }
-
-
-    if (rfbAiBtn) {
-
-        rfbAiBtn.disabled =
-            true;
-
-    }
-
-
-    if (rfbAiLoading) {
-
-        rfbAiLoading.hidden =
-            false;
-
-    }
-
-
-    if (rfbAiAnswer) {
-
-        rfbAiAnswer.hidden =
-            true;
-
-        rfbAiAnswer.textContent =
-            "";
-
-    }
-
-
-    if (rfbAiSources) {
-
-        rfbAiSources.hidden =
-            true;
-
-    }
-
-
-    if (rfbAiSourceList) {
-
-        rfbAiSourceList.innerHTML =
-            "";
-
-    }
-
-
-    try {
-
-        const data =
-            await askRfb(
-                question
-            );
-
-
-        const answer =
-            String(
-                data.answer || ""
-            ).trim();
-
-
-        if (rfbAiAnswer) {
-
-            rfbAiAnswer.textContent =
-                answer ||
-                "দুঃখিত, কোনো উত্তর পাওয়া যায়নি।";
-
-
-            rfbAiAnswer.hidden =
-                false;
-
-        }
-
-
-        renderAiSources(
-            data.sources || []
-        );
-
-    } catch (error) {
-
-        console.error(
-            "RFB Ask error:",
-            error
-        );
-
-
-        if (rfbAiAnswer) {
-
-            rfbAiAnswer.textContent =
-                "⚠️ " +
-                (
-                    error.message ||
-                    "RFB Ask-এ সমস্যা হয়েছে।"
-                );
-
-
-            rfbAiAnswer.hidden =
-                false;
-
-        }
-
-    } finally {
-
-        if (rfbAiLoading) {
-
-            rfbAiLoading.hidden =
-                true;
-
-        }
-
-
-        if (rfbAiBtn) {
-
-            rfbAiBtn.disabled =
-                false;
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   RFB ASK SOURCES
-========================================================= */
-
-function renderAiSources(
-    sources
-) {
-
-    if (
-        !rfbAiSources ||
-        !rfbAiSourceList
-    ) {
-
-        return;
-
-    }
-
-
-    rfbAiSourceList.innerHTML =
-        "";
-
-
-    if (
-        !Array.isArray(sources) ||
-        !sources.length
-    ) {
-
-        rfbAiSources.hidden =
-            true;
-
-        return;
-
-    }
-
-
-    sources
-        .slice(0, 10)
-        .forEach(source => {
-
-            if (!source?.url) {
-                return;
-            }
-
-
-            const link =
-                document.createElement("a");
-
-
-            link.href =
-                source.url;
-
-
-            link.target =
-                "_blank";
-
-
-            link.rel =
-                "noopener noreferrer";
-
-
-            link.className =
-                "rfb-ai-source";
-
-
-            link.textContent =
-                source.title ||
-                source.url;
-
-
-            rfbAiSourceList.appendChild(
-                link
-            );
-
-        });
-
-
-    rfbAiSources.hidden =
-        !rfbAiSourceList.children.length;
-
-}
+form.addEventListener(
+  "submit",
+  event => {
+
+    event.preventDefault();
+
+    runSearch(
+      input.value,
+      currentTab === "ask"
+        ? "all"
+        : currentTab
+    );
+
+  }
+);
 
 
 /* =========================================================
@@ -2417,177 +1405,75 @@ function renderAiSources(
 
 tabs.forEach(tab => {
 
-    tab.addEventListener(
-        "click",
-        () => {
+  tab.addEventListener(
+    "click",
+    () => {
 
-            tabs.forEach(
-                other => {
+      const mode =
+        tab.dataset.tab;
 
-                    other.classList.remove(
-                        "active"
-                    );
+      setActiveTab(mode);
 
+      if (!currentQuery) {
 
-                    other.setAttribute(
-                        "aria-selected",
-                        "false"
-                    );
+        if (mode === "ask") {
 
-                }
-            );
+          resultsSection.hidden = false;
 
+          homeInfo.hidden = true;
 
-            tab.classList.add(
-                "active"
-            );
+          rfbAskPanel.hidden = false;
 
-
-            tab.setAttribute(
-                "aria-selected",
-                "true"
-            );
-
-
-            const mode =
-                tab.dataset.tab ||
-                "all";
-
-
-            currentTab =
-                mode;
-
-
-            if (mode === "ask") {
-
-                showRfbAsk();
-
-                return;
-
-            }
-
-
-            if (currentQuery) {
-
-                runSearch(
-                    currentQuery,
-                    mode
-                );
-
-            }
+          rfbAskInput.focus();
 
         }
-    );
+
+        return;
+      }
+
+      runSearch(
+        currentQuery,
+        mode
+      );
+
+    }
+  );
 
 });
 
 
 /* =========================================================
-   FORM
+   ASK BUTTON
 ========================================================= */
 
-if (form) {
+rfbAskButton.addEventListener(
+  "click",
+  () => {
 
-    form.addEventListener(
-        "submit",
-        event => {
-
-            event.preventDefault();
-
-
-            runSearch(
-                input.value,
-                currentTab
-            );
-
-        }
+    runAskPanel(
+      rfbAskInput.value
     );
 
-}
+  }
+);
 
 
-/* =========================================================
-   RFB ASK BUTTON
-========================================================= */
+rfbAskInput.addEventListener(
+  "keydown",
+  event => {
 
-if (rfbAiBtn) {
+    if (event.key === "Enter") {
 
-    rfbAiBtn.addEventListener(
-        "click",
-        submitRfbAsk
-    );
+      event.preventDefault();
 
-}
+      runAskPanel(
+        rfbAskInput.value
+      );
 
+    }
 
-if (rfbAiInput) {
-
-    rfbAiInput.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key === "Enter"
-            ) {
-
-                event.preventDefault();
-
-                submitRfbAsk();
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   CLEAR
-========================================================= */
-
-if (
-    input &&
-    clearBtn
-) {
-
-    input.addEventListener(
-        "input",
-        () => {
-
-            clearBtn.hidden =
-                !input.value.trim();
-
-        }
-    );
-
-
-    clearBtn.addEventListener(
-        "click",
-        () => {
-
-            input.value =
-                "";
-
-
-            clearBtn.hidden =
-                true;
-
-
-            input.focus();
-
-
-            if (suggestions) {
-
-                suggestions.hidden =
-                    true;
-
-            }
-
-        }
-    );
-
-}
+  }
+);
 
 
 /* =========================================================
@@ -2595,239 +1481,68 @@ if (
 ========================================================= */
 
 document
-    .querySelectorAll(
-        ".quick"
-    )
-    .forEach(
-        button => {
+  .querySelectorAll(".quick")
+  .forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+    button.addEventListener(
+      "click",
+      () => {
 
-                    input.value =
-                        button.dataset.q ||
-                        button.textContent.trim();
+        const query =
+          button.dataset.q ||
+          button.textContent.trim();
 
+        currentTab = "all";
 
-                    if (clearBtn) {
+        runSearch(
+          query,
+          "all"
+        );
 
-                        clearBtn.hidden =
-                            false;
-
-                    }
-
-
-                    currentTab =
-                        "all";
-
-
-                    tabs.forEach(
-                        tab => {
-
-                            const active =
-                                tab.dataset.tab ===
-                                "all";
-
-
-                            tab.classList.toggle(
-                                "active",
-                                active
-                            );
-
-
-                            tab.setAttribute(
-                                "aria-selected",
-                                active
-                                    ? "true"
-                                    : "false"
-                            );
-
-                        }
-                    );
-
-
-                    runSearch(
-                        input.value,
-                        "all"
-                    );
-
-                }
-            );
-
-        }
+      }
     );
+
+  });
 
 
 /* =========================================================
-   SUGGESTIONS
+   CLEAR
 ========================================================= */
 
-if (
-    input &&
-    suggestions
-) {
+input.addEventListener(
+  "input",
+  () => {
 
-    input.addEventListener(
-        "input",
-        () => {
+    clearBtn.hidden =
+      !input.value.trim();
 
-            const query =
-                normalizeText(
-                    input.value
-                );
+  }
+);
 
 
-            if (!query) {
+clearBtn.addEventListener(
+  "click",
+  () => {
 
-                suggestions.hidden =
-                    true;
+    input.value = "";
 
-                return;
+    clearBtn.hidden = true;
 
-            }
+    currentQuery = "";
 
+    resultsSection.hidden = true;
 
-            let history =
-                [];
+    homeInfo.hidden = false;
 
+    inlineAsk.hidden = true;
 
-            try {
+    rfbAskPanel.hidden = true;
 
-                history =
-                    JSON.parse(
-                        localStorage.getItem(
-                            "rise-from-broken_history"
-                        ) ||
-                        "[]"
-                    );
+    results.innerHTML = "";
 
-            } catch {}
+    input.focus();
 
-
-            const demoTitles =
-                demoResults.map(
-                    item =>
-                        item.title
-                );
-
-
-            const unique =
-                [
-                    ...new Set([
-                        ...history,
-                        ...demoTitles
-                    ])
-                ];
-
-
-            const matched =
-                unique
-                    .filter(
-                        item =>
-                            normalizeText(
-                                item
-                            ).includes(
-                                query
-                            )
-                    )
-                    .slice(0, 7);
-
-
-            suggestions.innerHTML =
-                matched
-                    .map(
-                        item => `
-
-                          <button
-                            type="button"
-                            class="suggestion"
-                          >
-                            ${escapeHtml(
-                                item
-                            )}
-                          </button>
-
-                        `
-                    )
-                    .join("");
-
-
-            suggestions.hidden =
-                !matched.length;
-
-
-            suggestions
-                .querySelectorAll(
-                    "button"
-                )
-                .forEach(
-                    button => {
-
-                        button.onclick =
-                            () => {
-
-                                input.value =
-                                    button
-                                        .textContent
-                                        .trim();
-
-
-                                suggestions.hidden =
-                                    true;
-
-
-                                if (clearBtn) {
-
-                                    clearBtn.hidden =
-                                        false;
-
-                                }
-
-
-                                runSearch(
-                                    input.value,
-                                    currentTab
-                                );
-
-                            };
-
-                    }
-                );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   CLOSE SUGGESTIONS
-========================================================= */
-
-document.addEventListener(
-    "click",
-    event => {
-
-        if (
-            !event.target.closest(
-                ".search-box"
-            ) &&
-            !event.target.closest(
-                ".suggestions"
-            )
-        ) {
-
-            if (suggestions) {
-
-                suggestions.hidden =
-                    true;
-
-            }
-
-        }
-
-    }
+  }
 );
 
 
@@ -2835,240 +1550,246 @@ document.addEventListener(
    VOICE SEARCH
 ========================================================= */
 
-if (voiceBtn) {
+voiceBtn.addEventListener(
+  "click",
+  () => {
 
-    voiceBtn.addEventListener(
-        "click",
-        () => {
+    const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
 
-            const SpeechRecognition =
-                window.SpeechRecognition ||
-                window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
 
+      alert(
+        "Voice search is not supported in this browser."
+      );
 
-            if (!SpeechRecognition) {
+      return;
+    }
 
-                alert(
-                    "Voice search is not supported in this browser."
-                );
+    const recognition =
+      new SpeechRecognition();
 
-                return;
+    recognition.lang =
+      "en-US";
 
-            }
+    recognition.interimResults =
+      false;
 
+    recognition.maxAlternatives =
+      1;
 
-            const recognition =
-                new SpeechRecognition();
+    recognition.onresult =
+      event => {
 
+        const text =
+          event.results[0][0]
+            .transcript;
 
-            recognition.lang =
-                "en-US";
+        input.value = text;
 
+        runSearch(
+          text,
+          "all"
+        );
 
-            recognition.interimResults =
-                false;
+      };
 
+    recognition.start();
 
-            recognition.maxAlternatives =
-                1;
-
-
-            recognition.onresult =
-                event => {
-
-                    const text =
-                        event
-                            .results[0][0]
-                            .transcript;
-
-
-                    input.value =
-                        text;
-
-
-                    if (clearBtn) {
-
-                        clearBtn.hidden =
-                            false;
-
-                    }
+  }
+);
 
 
-                    runSearch(
-                        text,
-                        currentTab
-                    );
+/* =========================================================
+   SUGGESTIONS
+========================================================= */
 
-                };
+input.addEventListener(
+  "input",
+  () => {
+
+    if (!suggestions) {
+      return;
+    }
+
+    const query =
+      normalizeText(
+        input.value
+      );
+
+    if (!query) {
+
+      suggestions.hidden =
+        true;
+
+      return;
+    }
+
+    const matches =
+      demoResults
+        .map(item => item.title)
+        .filter(title =>
+          normalizeText(title)
+            .includes(query)
+        )
+        .slice(0, 6);
+
+    if (!matches.length) {
+
+      suggestions.hidden =
+        true;
+
+      return;
+    }
+
+    suggestions.innerHTML =
+      matches
+        .map(item => `
+          <button
+            class="suggestion"
+            type="button"
+          >
+            ${escapeHtml(item)}
+          </button>
+        `)
+        .join("");
+
+    suggestions.hidden =
+      false;
+
+    suggestions
+      .querySelectorAll(".suggestion")
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            input.value =
+              button.textContent.trim();
+
+            suggestions.hidden =
+              true;
+
+            runSearch(
+              input.value,
+              "all"
+            );
+
+          }
+        );
+
+      });
+
+  }
+);
 
 
-            recognition.onerror =
-                error => {
+/* =========================================================
+   CLOSE SUGGESTIONS
+========================================================= */
 
-                    console.warn(
-                        "Voice search:",
-                        error
-                    );
+document.addEventListener(
+  "click",
+  event => {
 
-                };
+    if (
+      !event.target.closest(
+        ".search-wrapper"
+      )
+    ) {
 
+      suggestions.hidden =
+        true;
 
-            recognition.start();
+    }
 
-        }
-    );
-
-}
+  }
+);
 
 
 /* =========================================================
    THEME
 ========================================================= */
 
-const themeButton =
-    document.querySelector(
-        "#themeBtn"
+const themeBtn =
+  document.querySelector(
+    "#themeBtn"
+  );
+
+
+themeBtn.addEventListener(
+  "click",
+  () => {
+
+    document.body.classList.toggle(
+      "light"
     );
 
-
-if (themeButton) {
-
-    themeButton.addEventListener(
-        "click",
-        () => {
-
-            document.body.classList.toggle(
-                "light"
-            );
-
-
-            localStorage.setItem(
-                "rise-from-broken_theme",
-                document.body.classList.contains(
-                    "light"
-                )
-                    ? "light"
-                    : "dark"
-            );
-
-        }
+    localStorage.setItem(
+      "rise-from-broken_theme",
+      document.body.classList.contains(
+        "light"
+      )
+      ? "light"
+      : "dark"
     );
 
-}
+  }
+);
 
 
 if (
-    localStorage.getItem(
-        "rise-from-broken_theme"
-    ) === "light"
+  localStorage.getItem(
+    "rise-from-broken_theme"
+  ) === "light"
 ) {
 
-    document.body.classList.add(
-        "light"
+  document.body.classList.add(
+    "light"
+  );
+
+}
+
+
+/* =========================================================
+   URL QUERY SUPPORT
+   Example:
+   ?q=python
+========================================================= */
+
+function loadQueryFromUrl() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
     );
 
-}
+  const query =
+    params.get("q");
 
+  if (!query) {
+    return;
+  }
 
-/* =========================================================
-   HTML ESCAPE
-========================================================= */
+  const decoded =
+    query.trim();
 
-function escapeHtml(value) {
+  if (!decoded) {
+    return;
+  }
 
-    return String(value || "")
-        .replace(
-            /[&<>"']/g,
-            char =>
-                ({
-                    "&": "&amp;",
-                    "<": "&lt;",
-                    ">": "&gt;",
-                    '"': "&quot;",
-                    "'": "&#039;"
-                })[char]
-        );
+  input.value =
+    decoded;
 
-}
+  clearBtn.hidden =
+    false;
 
-
-/* =========================================================
-   STRIP HTML
-========================================================= */
-
-function stripHtml(value) {
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-
-    div.innerHTML =
-        String(value || "");
-
-
-    return (
-        div.textContent ||
-        div.innerText ||
-        ""
-    );
-
-}
-
-
-/* =========================================================
-   SEARCH HISTORY
-========================================================= */
-
-function historyPush(query) {
-
-    try {
-
-        const history =
-            JSON.parse(
-                localStorage.getItem(
-                    "rise-from-broken_history"
-                ) ||
-                "[]"
-            );
-
-
-        const cleaned =
-            history.filter(
-                item =>
-                    normalizeText(
-                        item
-                    ) !==
-                    normalizeText(
-                        query
-                    )
-            );
-
-
-        cleaned.unshift(
-            query
-        );
-
-
-        localStorage.setItem(
-            "rise-from-broken_history",
-            JSON.stringify(
-                cleaned.slice(
-                    0,
-                    10
-                )
-            )
-        );
-
-    } catch (error) {
-
-        console.warn(
-            "History error:",
-            error
-        );
-
-    }
+  runSearch(
+    decoded,
+    "all"
+  );
 
 }
 
@@ -3077,11 +1798,19 @@ function historyPush(query) {
    START
 ========================================================= */
 
-console.log(
-    "Rise From Broken Search Engine loaded successfully."
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    setTimeout(
+      loadQueryFromUrl,
+      100
+    );
+
+  }
 );
 
+
 console.log(
-    "RFB Ask integration loaded."
+  "Rise From Broken loaded successfully."
 );
-```
