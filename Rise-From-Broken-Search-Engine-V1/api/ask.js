@@ -20,11 +20,7 @@ export default async function handler(req, res) {
   try {
     const { question } = req.body || {};
 
-    if (
-      !question ||
-      typeof question !== "string" ||
-      !question.trim()
-    ) {
+    if (!question || typeof question !== "string" || !question.trim()) {
       return res.status(400).json({
         error: "প্রশ্ন পাঠাও"
       });
@@ -47,29 +43,23 @@ export default async function handler(req, res) {
 
     if (TAVILY_API_KEY) {
       try {
-        const searchRes = await fetch(
-          "https://api.tavily.com/search",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              api_key: TAVILY_API_KEY,
-              query: question,
-              search_depth: "basic",
-              max_results: 4
-            })
-          }
-        );
+        const searchRes = await fetch("https://api.tavily.com/search", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            api_key: TAVILY_API_KEY,
+            query: question,
+            search_depth: "basic",
+            max_results: 4
+          })
+        });
 
         if (searchRes.ok) {
           const searchData = await searchRes.json();
 
-          if (
-            searchData.results &&
-            searchData.results.length > 0
-          ) {
+          if (searchData.results?.length) {
             searchContext = searchData.results
               .map(
                 (r, i) =>
@@ -103,35 +93,30 @@ export default async function handler(req, res) {
 4. গণিতের প্রশ্ন হলে সরাসরি সঠিক উত্তর দেবে।
    অপ্রয়োজনীয় ব্যাখ্যা দেবে না।
 
-5. যেমন:
+5. উদাহরণ:
    প্রশ্ন: 25 × 48
    উত্তর: 1200
 
-6. কোনো প্রশ্নের উত্তর দেওয়ার জন্য নিচে Internet Search Result দেওয়া থাকলে
-   সেগুলো ব্যবহার করবে।
+6. Internet Search Result দেওয়া থাকলে প্রয়োজন অনুযায়ী তা ব্যবহার করবে।
 
 7. Search Result না থাকলে নিজের জ্ঞান ব্যবহার করবে।
 
-8. উত্তর দেওয়ার আগে "উত্তর:" বা "RFB Ask:" লিখবে না।
+8. উত্তরের শুরুতে "উত্তর:" বা "RFB Ask:" লিখবে না।
 
-9. অপ্রয়োজনীয় ভূমিকা, ক্ষমা চাওয়া বা অতিরিক্ত কথা বলবে না।
+9. অপ্রয়োজনীয় ভূমিকা বা অতিরিক্ত কথা বলবে না।
 
 10. কেউ তোমার নাম জিজ্ঞেস করলে বলবে:
     "আমি RFB Ask — Rise From Broken-এর AI Assistant।"
 `;
 
     const userPrompt = searchContext
-      ? `
-প্রশ্ন:
+      ? `প্রশ্ন:
 ${question}
 
 Internet Search Result:
-${searchContext}
-`
-      : `
-প্রশ্ন:
-${question}
-`;
+${searchContext}`
+      : `প্রশ্ন:
+${question}`;
 
     // ==========================================
     // CEREBRAS AI
@@ -148,7 +133,7 @@ ${question}
         },
 
         body: JSON.stringify({
-          model: "llama-3.3-70b",
+          model: "gpt-oss-120b",
           messages: [
             {
               role: "system",
@@ -168,10 +153,7 @@ ${question}
     if (!aiRes.ok) {
       const errorText = await aiRes.text();
 
-      console.error(
-        "Cerebras API error:",
-        errorText
-      );
+      console.error("Cerebras API error:", errorText);
 
       return res.status(502).json({
         error: "Cerebras AI থেকে উত্তর পাওয়া যায়নি"
@@ -184,21 +166,13 @@ ${question}
       aiData.choices?.[0]?.message?.content?.trim() ||
       "দুঃখিত, উত্তর তৈরি করা যায়নি।";
 
-    // ==========================================
-    // RESPONSE
-    // ==========================================
-
     return res.status(200).json({
       answer,
       usedSearch: Boolean(searchContext)
     });
 
   } catch (error) {
-
-    console.error(
-      "RFB Ask server error:",
-      error
-    );
+    console.error("RFB Ask server error:", error);
 
     return res.status(500).json({
       error: "সার্ভারে সমস্যা হয়েছে। আবার চেষ্টা করো।"
