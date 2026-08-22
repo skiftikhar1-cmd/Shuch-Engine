@@ -1,5 +1,5 @@
 // /api/ask.js
-// RFB Ask — Tavily Search Debug Version
+// RFB Ask — Tavily RAW Search Test
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   try {
     const { question } = req.body || {};
 
-    if (!question || typeof question !== "string" || !question.trim()) {
+    if (!question || typeof question !== "string") {
       return res.status(400).json({
         error: "প্রশ্ন পাঠাও"
       });
@@ -33,81 +33,53 @@ export default async function handler(req, res) {
       });
     }
 
-    // ==========================================
-    // TAVILY SEARCH
-    // ==========================================
-
-    const searchRes = await fetch(
+    const response = await fetch(
       "https://api.tavily.com/search",
       {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json"
         },
-
         body: JSON.stringify({
           api_key: TAVILY_API_KEY,
           query: question,
           search_depth: "advanced",
-          topic: "general",
-          max_results: 6,
-          include_answer: true,
-          include_raw_content: false
+          topic: "news",
+          max_results: 5,
+          include_answer: true
         })
       }
     );
 
-    const searchText = await searchRes.text();
+    const data = await response.json();
 
-    if (!searchRes.ok) {
+    if (!response.ok) {
       return res.status(502).json({
-        error: "Tavily Error",
-        details: searchText
-      });
-    }
-
-    let searchData;
-
-    try {
-      searchData = JSON.parse(searchText);
-    } catch {
-      return res.status(502).json({
-        error: "Tavily JSON পাওয়া যায়নি",
-        details: searchText
+        error: "Tavily API Error",
+        details: data
       });
     }
 
     // ==========================================
-    // DEBUG RESPONSE
+    // RAW TAVILY RESULT
     // ==========================================
 
     return res.status(200).json({
-      debug: true,
+      success: true,
+      question: question,
 
-      question,
+      tavily_answer: data.answer || null,
 
-      tavilyAnswer: searchData.answer || null,
-
-      results: (searchData.results || []).map((r, i) => ({
-        number: i + 1,
-        title: r.title || "",
-        url: r.url || "",
-        content: r.content || "",
-        score: r.score ?? null
-      })),
-
-      message:
-        "এটা DEBUG MODE। এখানে Tavily যে Internet Search Result দিয়েছে সেটাই দেখা যাচ্ছে।"
+      results: (data.results || []).map((item, index) => ({
+        number: index + 1,
+        title: item.title,
+        url: item.url,
+        content: item.content,
+        score: item.score
+      }))
     });
 
   } catch (error) {
-
-    console.error(
-      "Tavily Debug Error:",
-      error
-    );
-
     return res.status(500).json({
       error: error.message
     });
