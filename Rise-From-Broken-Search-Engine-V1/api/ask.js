@@ -43,18 +43,21 @@ export default async function handler(req, res) {
 
     if (TAVILY_API_KEY) {
       try {
-        const searchRes = await fetch("https://api.tavily.com/search", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            api_key: TAVILY_API_KEY,
-            query: question,
-            search_depth: "basic",
-            max_results: 4
-          })
-        });
+        const searchRes = await fetch(
+          "https://api.tavily.com/search",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              api_key: TAVILY_API_KEY,
+              query: question,
+              search_depth: "basic",
+              max_results: 4
+            })
+          }
+        );
 
         if (searchRes.ok) {
           const searchData = await searchRes.json();
@@ -85,28 +88,14 @@ export default async function handler(req, res) {
 নিয়ম:
 
 1. ইউজার বাংলা, ইংরেজি বা বাংলিশে প্রশ্ন করলে সেই ভাষাতেই উত্তর দেবে।
-
 2. সাধারণ প্রশ্নের উত্তর সংক্ষিপ্ত রাখবে।
-
 3. সাধারণত ১-৩ লাইনে উত্তর দেবে।
-
 4. গণিতের প্রশ্ন হলে সরাসরি সঠিক উত্তর দেবে।
-   অপ্রয়োজনীয় ব্যাখ্যা দেবে না।
-
-5. উদাহরণ:
-   প্রশ্ন: 25 × 48
-   উত্তর: 1200
-
-6. Internet Search Result দেওয়া থাকলে প্রয়োজন অনুযায়ী তা ব্যবহার করবে।
-
+5. অপ্রয়োজনীয় ভূমিকা বা অতিরিক্ত কথা বলবে না।
+6. Search Result দেওয়া থাকলে প্রয়োজন অনুযায়ী ব্যবহার করবে।
 7. Search Result না থাকলে নিজের জ্ঞান ব্যবহার করবে।
-
-8. উত্তরের শুরুতে "উত্তর:" বা "RFB Ask:" লিখবে না।
-
-9. অপ্রয়োজনীয় ভূমিকা বা অতিরিক্ত কথা বলবে না।
-
-10. কেউ তোমার নাম জিজ্ঞেস করলে বলবে:
-    "আমি RFB Ask — Rise From Broken-এর AI Assistant।"
+8. কেউ তোমার নাম জিজ্ঞেস করলে বলবে:
+"আমি RFB Ask — Rise From Broken-এর AI Assistant।"
 `;
 
     const userPrompt = searchContext
@@ -134,6 +123,7 @@ ${question}`;
 
         body: JSON.stringify({
           model: "gpt-oss-120b",
+
           messages: [
             {
               role: "system",
@@ -144,11 +134,16 @@ ${question}`;
               content: userPrompt
             }
           ],
+
           temperature: 0.2,
           max_tokens: 300
         })
       }
     );
+
+    // ==========================================
+    // SHOW REAL CEREBRAS ERROR
+    // ==========================================
 
     if (!aiRes.ok) {
       const errorText = await aiRes.text();
@@ -156,7 +151,7 @@ ${question}`;
       console.error("Cerebras API error:", errorText);
 
       return res.status(502).json({
-        error: "Cerebras AI থেকে উত্তর পাওয়া যায়নি"
+        error: `Cerebras Error: ${errorText}`
       });
     }
 
@@ -175,7 +170,7 @@ ${question}`;
     console.error("RFB Ask server error:", error);
 
     return res.status(500).json({
-      error: "সার্ভারে সমস্যা হয়েছে। আবার চেষ্টা করো।"
+      error: `Server Error: ${error.message}`
     });
   }
 }
