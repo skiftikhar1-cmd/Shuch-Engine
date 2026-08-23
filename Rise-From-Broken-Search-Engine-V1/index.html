@@ -9,7 +9,7 @@
   >
 
   <!-- =====================================================
-       SEO
+       BASIC SEO
   ====================================================== -->
 
   <title>Rise From Broken — Smart Search Engine</title>
@@ -21,7 +21,7 @@
 
   <meta
     name="keywords"
-    content="Rise From Broken, RFB, search engine, web search, image search, video search, news search, AI search, multilingual search, Bangladesh"
+    content="Rise From Broken, RFB, search engine, smart search, multilingual search, web search, image search, video search, news search, AI search"
   >
 
   <meta
@@ -29,10 +29,16 @@
     content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
   >
 
+  <meta
+    name="theme-color"
+    content="#0b0f19"
+  >
+
   <link
     rel="canonical"
     href="https://rise-from-broken.vercel.app/"
   >
+
 
   <!-- =====================================================
        OPEN GRAPH
@@ -50,7 +56,7 @@
 
   <meta
     property="og:description"
-    content="Search the web, images, videos and news with Rise From Broken. Get quick AI-powered answers with RFB Ask."
+    content="Search the web, images, videos, news and get AI-powered answers with Rise From Broken."
   >
 
   <meta
@@ -63,23 +69,14 @@
     content="Rise From Broken"
   >
 
-  <meta
-    property="og:image"
-    content="https://rise-from-broken.vercel.app/assets/shuch-logo.png"
-  >
-
-  <meta
-    property="og:image:alt"
-    content="Rise From Broken Search Engine"
-  >
 
   <!-- =====================================================
-       TWITTER / X
+       TWITTER / SOCIAL PREVIEW
   ====================================================== -->
 
   <meta
     name="twitter:card"
-    content="summary_large_image"
+    content="summary"
   >
 
   <meta
@@ -89,32 +86,33 @@
 
   <meta
     name="twitter:description"
-    content="Search the web, images, videos and news with Rise From Broken."
+    content="A smart multilingual search engine for web, images, videos, news and AI answers."
   >
 
-  <meta
-    name="twitter:image"
-    content="https://rise-from-broken.vercel.app/assets/shuch-logo.png"
-  >
 
   <!-- =====================================================
-       THEME
+       STRUCTURED DATA — GOOGLE
   ====================================================== -->
 
-  <meta
-    name="theme-color"
-    content="#0b0f19"
-  >
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Rise From Broken",
+    "alternateName": "RFB",
+    "url": "https://rise-from-broken.vercel.app/",
+    "description": "Rise From Broken is a smart multilingual search engine for web, images, videos, news and AI-powered answers.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://rise-from-broken.vercel.app/?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
 
-  <!-- =====================================================
-       FAVICON
-  ====================================================== -->
-
-  <link
-    rel="icon"
-    type="image/png"
-    href="assets/shuch-logo.png"
-  >
 
   <!-- =====================================================
        CSS
@@ -125,6 +123,7 @@
     href="style.css"
   >
 
+
   <!-- =====================================================
        SUPABASE
   ====================================================== -->
@@ -133,8 +132,8 @@
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     defer
   ></script>
-</head>
 
+</head>
 <body>
 
 <header class="site-header">
