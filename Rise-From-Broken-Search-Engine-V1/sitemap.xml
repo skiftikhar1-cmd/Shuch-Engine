@@ -6,4 +6,9 @@
     <priority>1.0</priority>
   </url>
 
+  <url>
+    <loc>https://rise-from-broken.vercel.app/privacy.html</loc>
+    <priority>0.5</priority>
+  </url>
+
 </urlset>
