@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
 
@@ -9,19 +10,31 @@
   >
 
   <!-- =====================================================
-       BASIC SEO
+       PRIMARY SEO
   ====================================================== -->
 
-  <title>Rise From Broken — Smart Search Engine</title>
+  <title>
+    Rise From Broken — Smart Multilingual Search Engine
+  </title>
 
   <meta
     name="description"
-    content="Rise From Broken is a safe, simple and multilingual search engine for web, images, videos, news and AI-powered answers."
+    content="Rise From Broken is a smart multilingual search engine for web, images, videos, news and AI-powered answers. Search the web your way with RFB."
   >
 
   <meta
     name="keywords"
-    content="Rise From Broken, RFB, search engine, smart search, multilingual search, web search, image search, video search, news search, AI search"
+    content="Rise From Broken, RFB, Rise From Broken Search Engine, RFB Search, search engine, smart search engine, multilingual search engine, web search, image search, video search, news search, AI search, AI assistant"
+  >
+
+  <meta
+    name="author"
+    content="Rise From Broken"
+  >
+
+  <meta
+    name="application-name"
+    content="Rise From Broken"
   >
 
   <meta
@@ -30,8 +43,18 @@
   >
 
   <meta
+    name="googlebot"
+    content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+  >
+
+  <meta
     name="theme-color"
     content="#0b0f19"
+  >
+
+  <meta
+    name="color-scheme"
+    content="dark light"
   >
 
   <link
@@ -39,6 +62,21 @@
     href="https://rise-from-broken.vercel.app/"
   >
 
+  <!-- =====================================================
+       LANGUAGE / INTERNATIONAL SEO
+  ====================================================== -->
+
+  <link
+    rel="alternate"
+    hreflang="en"
+    href="https://rise-from-broken.vercel.app/"
+  >
+
+  <link
+    rel="alternate"
+    hreflang="x-default"
+    href="https://rise-from-broken.vercel.app/"
+  >
 
   <!-- =====================================================
        OPEN GRAPH
@@ -50,13 +88,18 @@
   >
 
   <meta
+    property="og:locale"
+    content="en_US"
+  >
+
+  <meta
     property="og:title"
-    content="Rise From Broken — Smart Search Engine"
+    content="Rise From Broken — Smart Multilingual Search Engine"
   >
 
   <meta
     property="og:description"
-    content="Search the web, images, videos, news and get AI-powered answers with Rise From Broken."
+    content="Search the web, images, videos and news, or get AI-powered answers with Rise From Broken."
   >
 
   <meta
@@ -69,9 +112,18 @@
     content="Rise From Broken"
   >
 
+  <meta
+    property="og:image"
+    content="https://rise-from-broken.vercel.app/assets/shuch-logo.png"
+  >
+
+  <meta
+    property="og:image:alt"
+    content="Rise From Broken logo"
+  >
 
   <!-- =====================================================
-       TWITTER / SOCIAL PREVIEW
+       TWITTER / SOCIAL SEO
   ====================================================== -->
 
   <meta
@@ -81,38 +133,110 @@
 
   <meta
     name="twitter:title"
-    content="Rise From Broken — Smart Search Engine"
+    content="Rise From Broken — Smart Multilingual Search Engine"
   >
 
   <meta
     name="twitter:description"
-    content="A safe multilingual search engine for web, images, videos, news and AI answers."
+    content="Search the web, images, videos and news with Rise From Broken. Get quick AI-powered answers with RFB Ask."
   >
 
+  <meta
+    name="twitter:image"
+    content="https://rise-from-broken.vercel.app/assets/shuch-logo.png"
+  >
+
+  <meta
+    name="twitter:image:alt"
+    content="Rise From Broken logo"
+  >
 
   <!-- =====================================================
-       STRUCTURED DATA — GOOGLE
+       STRUCTURED DATA — WEBSITE
   ====================================================== -->
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": "https://rise-from-broken.vercel.app/#website",
     "name": "Rise From Broken",
-    "alternateName": "RFB",
+    "alternateName": [
+      "RFB",
+      "Rise From Broken Search Engine"
+    ],
     "url": "https://rise-from-broken.vercel.app/",
-    "description": "Rise From Broken is a safe, simple and multilingual search engine for web, images, videos, news and AI-powered answers.",
+    "description": "Rise From Broken is a smart multilingual search engine for web, images, videos, news and AI-powered answers.",
+    "inLanguage": [
+      "en",
+      "bn"
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "@id": "https://rise-from-broken.vercel.app/#organization",
+      "name": "Rise From Broken",
+      "url": "https://rise-from-broken.vercel.app/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://rise-from-broken.vercel.app/assets/shuch-logo.png"
+      }
+    },
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
         "urlTemplate": "https://rise-from-broken.vercel.app/?q={search_term_string}"
       },
-      "query-input": "required name=search_term_string"
+      "query-input": {
+        "@type": "PropertyValueSpecification",
+        "valueRequired": true,
+        "valueName": "search_term_string"
+      }
     }
   }
   </script>
 
+  <!-- =====================================================
+       STRUCTURED DATA — ORGANIZATION
+  ====================================================== -->
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://rise-from-broken.vercel.app/#organization",
+    "name": "Rise From Broken",
+    "alternateName": "RFB",
+    "url": "https://rise-from-broken.vercel.app/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://rise-from-broken.vercel.app/assets/shuch-logo.png"
+    },
+    "email": "mailto:risefrombroken@gmail.com"
+  }
+  </script>
+
+  <!-- =====================================================
+       WEBPAGE STRUCTURED DATA
+  ====================================================== -->
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": "https://rise-from-broken.vercel.app/#webpage",
+    "url": "https://rise-from-broken.vercel.app/",
+    "name": "Rise From Broken — Smart Multilingual Search Engine",
+    "description": "Search the web, images, videos and news with Rise From Broken and get AI-powered answers with RFB Ask.",
+    "isPartOf": {
+      "@id": "https://rise-from-broken.vercel.app/#website"
+    },
+    "about": {
+      "@id": "https://rise-from-broken.vercel.app/#organization"
+    },
+    "inLanguage": "en"
+  }
+  </script>
 
   <!-- =====================================================
        CSS
@@ -122,7 +246,6 @@
     rel="stylesheet"
     href="style.css"
   >
-
 
   <!-- =====================================================
        SUPABASE
@@ -135,333 +258,313 @@
 
 </head>
 
+
 <body>
 
-<header class="site-header">
-
-  <div class="header-inner">
-
-    <a href="/" class="brand">
-
-      <div class="brand-logo">
-
-        <img
-          src="assets/shuch-logo.png"
-          alt="Rise From Broken"
-          onerror="this.style.display='none'"
-        >
-
-        <span>RFB</span>
-
-      </div>
-
-      <div class="brand-text">
-
-        <strong>Rise From Broken</strong>
-
-        <span>Search Engine</span>
-
-      </div>
-
-    </a>
-
-
-    <button
-      id="themeBtn"
-      class="icon-btn"
-      type="button"
-      aria-label="Toggle theme"
-    >
-      ☾
-    </button>
-
-  </div>
-
-</header>
-
-
-<main class="main-container">
-
-
   <!-- =====================================================
-       HOME / SEARCH
+       HEADER
   ====================================================== -->
 
-  <section class="hero">
+  <header class="site-header">
 
-    <div class="hero-content">
+    <div class="header-inner">
 
+      <a
+        href="/"
+        class="brand"
+        aria-label="Rise From Broken home"
+      >
 
-      <div class="hero-logo">
+        <div class="brand-logo">
 
-        <img
-          src="assets/shuch-logo.png"
-          alt="Rise From Broken"
-          onerror="this.style.display='none'"
-        >
-
-        <span>RFB</span>
-
-      </div>
-
-
-      <h1>
-
-        Search the world.
-
-        <span>Your way.</span>
-
-      </h1>
-
-
-      <p class="hero-description">
-
-        Search the web, images, videos, news and ask RFB AI.
-
-      </p>
-
-
-      <div class="search-wrapper">
-
-
-        <form
-          id="searchForm"
-          class="search-box"
-          autocomplete="off"
-        >
-
-          <span class="search-icon">⌕</span>
-
-
-          <input
-            id="searchInput"
-            name="q"
-            type="search"
-            placeholder="Search anything..."
-            autocomplete="off"
-            spellcheck="false"
+          <img
+            src="assets/shuch-logo.png"
+            alt="Rise From Broken logo"
+            width="40"
+            height="40"
           >
 
+          <span>RFB</span>
 
-          <button
-            id="voiceBtn"
-            class="search-action"
-            type="button"
-            title="Voice search"
-          >
-            🎙
-          </button>
+        </div>
 
+        <div class="brand-text">
 
-          <button
-            id="clearBtn"
-            class="search-action"
-            type="button"
-            title="Clear"
-            hidden
-          >
-            ×
-          </button>
+          <strong>Rise From Broken</strong>
+
+          <span>Smart Search Engine</span>
+
+        </div>
+
+      </a>
 
 
-          <button
-            class="search-submit"
-            type="submit"
-          >
-            Search
-          </button>
-
-        </form>
-
-
-        <div
-          id="suggestions"
-          class="suggestions"
-          hidden
-        ></div>
-
-      </div>
-
-
-      <div class="quick-searches">
-
-        <span>Try:</span>
-
-
-        <button
-          class="quick"
-          data-q="Python"
-        >
-          Python
-        </button>
-
-
-        <button
-          class="quick"
-          data-q="Bangladesh"
-        >
-          Bangladesh
-        </button>
-
-
-        <button
-          class="quick"
-          data-q="Artificial Intelligence"
-        >
-          AI
-        </button>
-
-
-        <button
-          class="quick"
-          data-q="Technology"
-        >
-          Technology
-        </button>
-
-      </div>
+      <button
+        id="themeBtn"
+        class="icon-btn"
+        type="button"
+        aria-label="Toggle light and dark theme"
+      >
+        ☾
+      </button>
 
     </div>
 
-  </section>
+  </header>
 
 
   <!-- =====================================================
-       SEARCH AREA
+       MAIN
   ====================================================== -->
 
-  <section
-    id="resultsSection"
-    class="search-content"
-    hidden
-  >
+  <main class="main-container">
 
-
-    <!-- =================================================
-         TABS
-    ================================================== -->
-
-    <nav class="search-tabs">
-
-
-      <button
-        class="search-tab active"
-        data-tab="ask"
-        type="button"
-      >
-
-        <span>🤖</span>
-
-        RFB Ask
-
-      </button>
-
-
-      <button
-        class="search-tab"
-        data-tab="all"
-        type="button"
-      >
-
-        <span>⌕</span>
-
-        All
-
-      </button>
-
-
-      <button
-        class="search-tab"
-        data-tab="images"
-        type="button"
-      >
-
-        <span>▧</span>
-
-        Images
-
-      </button>
-
-
-      <button
-        class="search-tab"
-        data-tab="videos"
-        type="button"
-      >
-
-        <span>▶</span>
-
-        Videos
-
-      </button>
-
-
-      <button
-        class="search-tab"
-        data-tab="news"
-        type="button"
-      >
-
-        <span>◉</span>
-
-        News
-
-      </button>
-
-    </nav>
-
-
-    <!-- =================================================
-         RESULT HEADER
-    ================================================== -->
-
-    <div class="results-header">
-
-      <div>
-
-        <h2 id="resultsTitle">
-          Search Results
-        </h2>
-
-
-        <p
-          id="resultCount"
-          class="result-count"
-        >
-          0 results
-        </p>
-
-      </div>
-
-    </div>
-
-
-    <!-- =================================================
-         RFB ASK
-    ================================================== -->
+    <!-- ===================================================
+         HERO / MAIN SEO CONTENT
+    ==================================================== -->
 
     <section
-      id="rfbAskPanel"
-      class="rfb-ask-panel"
-      hidden
+      class="hero"
+      aria-labelledby="main-heading"
     >
 
+      <div class="hero-content">
 
-      <div class="ask-header">
+        <div
+          class="hero-logo"
+          aria-hidden="true"
+        >
 
-        <div class="ask-icon">
-          🤖
+          <img
+            src="assets/shuch-logo.png"
+            alt=""
+            width="72"
+            height="72"
+          >
+
+          <span>RFB</span>
+
         </div>
 
 
+        <h1 id="main-heading">
+          Search the world.
+          <span>Your way.</span>
+        </h1>
+
+
+        <p class="hero-description">
+          Rise From Broken is a smart multilingual search engine
+          for web pages, images, videos, news and AI-powered answers.
+        </p>
+
+
+        <!-- ===============================================
+             SEARCH
+        ================================================ -->
+
+        <div class="search-wrapper">
+
+          <form
+            id="searchForm"
+            class="search-box"
+            autocomplete="off"
+            role="search"
+          >
+
+            <span
+              class="search-icon"
+              aria-hidden="true"
+            >
+              ⌕
+            </span>
+
+
+            <input
+              id="searchInput"
+              name="q"
+              type="search"
+              placeholder="Search anything..."
+              aria-label="Search Rise From Broken"
+              autocomplete="off"
+              spellcheck="false"
+            >
+
+
+            <button
+              id="voiceBtn"
+              class="search-action"
+              type="button"
+              title="Voice search"
+              aria-label="Voice search"
+            >
+              🎙
+            </button>
+
+
+            <button
+              id="clearBtn"
+              class="search-action"
+              type="button"
+              title="Clear search"
+              aria-label="Clear search"
+              hidden
+            >
+              ×
+            </button>
+
+
+            <button
+              class="search-submit"
+              type="submit"
+            >
+              Search
+            </button>
+
+          </form>
+
+
+          <div
+            id="suggestions"
+            class="suggestions"
+            hidden
+          ></div>
+
+        </div>
+
+
+        <!-- ===============================================
+             QUICK SEARCHES
+        ================================================ -->
+
+        <div class="quick-searches">
+
+          <span>Try:</span>
+
+          <button
+            class="quick"
+            data-q="Python"
+            type="button"
+          >
+            Python
+          </button>
+
+          <button
+            class="quick"
+            data-q="Bangladesh"
+            type="button"
+          >
+            Bangladesh
+          </button>
+
+          <button
+            class="quick"
+            data-q="Artificial Intelligence"
+            type="button"
+          >
+            AI
+          </button>
+
+          <button
+            class="quick"
+            data-q="Technology"
+            type="button"
+          >
+            Technology
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         SEARCH RESULTS
+    ==================================================== -->
+
+    <section
+      id="resultsSection"
+      class="search-content"
+      hidden
+      aria-label="Search results"
+    >
+
+      <!-- TABS -->
+
+      <nav
+        class="search-tabs"
+        aria-label="Search categories"
+      >
+
+        <button
+          class="search-tab active"
+          data-tab="ask"
+          type="button"
+        >
+          <span aria-hidden="true">🤖</span>
+          RFB Ask
+        </button>
+
+
+        <button
+          class="search-tab"
+          data-tab="all"
+          type="button"
+        >
+          <span aria-hidden="true">⌕</span>
+          All
+        </button>
+
+
+        <button
+          class="search-tab"
+          data-tab="images"
+          type="button"
+        >
+          <span aria-hidden="true">▧</span>
+          Images
+        </button>
+
+
+        <button
+          class="search-tab"
+          data-tab="videos"
+          type="button"
+        >
+          <span aria-hidden="true">▶</span>
+          Videos
+        </button>
+
+
+        <button
+          class="search-tab"
+          data-tab="news"
+          type="button"
+        >
+          <span aria-hidden="true">◉</span>
+          News
+        </button>
+
+      </nav>
+
+
+      <!-- RESULT HEADER -->
+
+      <div class="results-header">
+
         <div>
 
-          <h3>
-            RFB Ask
-          </h3>
+          <h2 id="resultsTitle">
+            Search Results
+          </h2>
 
-          <p>
-            Ask Rise From Broken AI
+          <p
+            id="resultCount"
+            class="result-count"
+          >
+            0 results
           </p>
 
         </div>
@@ -469,641 +572,321 @@
       </div>
 
 
-      <div class="ask-input-row">
+      <!-- =================================================
+           RFB ASK
+      ================================================== -->
 
-
-        <input
-          id="rfbAskInput"
-          type="text"
-          placeholder="Ask anything..."
-          autocomplete="off"
-        >
-
-
-        <button
-          id="rfbAskButton"
-          type="button"
-        >
-          Ask
-        </button>
-
-      </div>
-
-
-      <div
-        id="rfbAskLoading"
-        class="ask-loading"
+      <section
+        id="rfbAskPanel"
+        class="rfb-ask-panel"
         hidden
+        aria-label="RFB Ask AI assistant"
       >
-        RFB is thinking...
+
+        <div class="ask-header">
+
+          <div
+            class="ask-icon"
+            aria-hidden="true"
+          >
+            🤖
+          </div>
+
+          <div>
+
+            <h3>RFB Ask</h3>
+
+            <p>
+              Ask Rise From Broken AI
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="ask-input-row">
+
+          <input
+            id="rfbAskInput"
+            type="text"
+            placeholder="Ask anything..."
+            aria-label="Ask RFB AI"
+            autocomplete="off"
+          >
+
+
+          <button
+            id="rfbAskButton"
+            type="button"
+          >
+            Ask
+          </button>
+
+        </div>
+
+
+        <div
+          id="rfbAskLoading"
+          class="ask-loading"
+          hidden
+          aria-live="polite"
+        >
+          RFB is thinking...
+        </div>
+
+
+        <div
+          id="rfbAskAnswer"
+          class="ask-answer"
+          hidden
+          aria-live="polite"
+        ></div>
+
+      </section>
+
+
+      <!-- INLINE AI -->
+
+      <div
+        id="inlineAsk"
+        class="inline-ask"
+        hidden
+        aria-live="polite"
+      >
+
+        <div
+          class="inline-ask-icon"
+          aria-hidden="true"
+        >
+          🤖
+        </div>
+
+        <div class="inline-ask-content">
+
+          <strong>RFB Ask</strong>
+
+          <p id="inlineAskText">
+            Getting a quick explanation...
+          </p>
+
+        </div>
+
       </div>
 
 
+      <!-- RESULTS -->
+
       <div
-        id="rfbAskAnswer"
-        class="ask-answer"
-        hidden
+        id="results"
+        class="results-list"
       ></div>
 
-    </section>
 
+      <!-- EMPTY -->
 
-    <!-- =================================================
-         ONE LINE AI EXPLANATION
-    ================================================== -->
+      <div
+        id="emptyState"
+        class="empty"
+        hidden
+      >
 
-    <div
-      id="inlineAsk"
-      class="inline-ask"
-      hidden
-    >
+        <div
+          class="empty-mark"
+          aria-hidden="true"
+        >
+          ⌕
+        </div>
 
+        <h3>
+          No results found
+        </h3>
 
-      <div class="inline-ask-icon">
-        🤖
-      </div>
-
-
-      <div class="inline-ask-content">
-
-        <strong>
-          RFB Ask
-        </strong>
-
-
-        <p id="inlineAskText">
-          Getting a quick explanation...
+        <p>
+          Try another search.
         </p>
 
       </div>
 
-    </div>
+
+      <!-- LOADING -->
+
+      <div
+        id="loadingState"
+        class="loading-state"
+        hidden
+        aria-live="polite"
+      >
+
+        <div
+          class="spinner"
+          aria-hidden="true"
+        ></div>
+
+        <p>
+          Searching...
+        </p>
+
+      </div>
+
+    </section>
 
 
-    <!-- =================================================
-         RESULTS
-    ================================================== -->
+    <!-- ===================================================
+         HOME INFORMATION
+    ==================================================== -->
 
-    <div
-      id="results"
-      class="results-list"
-    ></div>
-
-
-    <!-- =================================================
-         EMPTY
-    ================================================== -->
-
-    <div
-      id="emptyState"
-      class="empty"
-      hidden
+    <section
+      id="homeInfo"
+      class="home-info"
+      aria-label="Rise From Broken features"
     >
 
-      <div class="empty-mark">
-        ⌕
+      <div class="info-card">
+
+        <div
+          class="info-icon"
+          aria-hidden="true"
+        >
+          🔎
+        </div>
+
+        <h3>
+          Smart Search
+        </h3>
+
+        <p>
+          Search websites and information quickly with Rise From Broken.
+        </p>
+
       </div>
 
 
-      <h3>
-        No results found
-      </h3>
+      <div class="info-card">
 
+        <div
+          class="info-icon"
+          aria-hidden="true"
+        >
+          🤖
+        </div>
 
-      <p>
-        Try another search.
-      </p>
+        <h3>
+          RFB Ask
+        </h3>
 
-    </div>
+        <p>
+          Ask questions and get quick AI-powered answers.
+        </p>
 
-
-    <!-- =================================================
-         LOADING
-    ================================================== -->
-
-    <div
-      id="loadingState"
-      class="loading-state"
-      hidden
-    >
-
-      <div class="spinner"></div>
-
-
-      <p>
-        Searching...
-      </p>
-
-    </div>
-
-  </section>
-
-
-  <!-- =====================================================
-       HOME INFO
-  ====================================================== -->
-
-  <section
-    id="homeInfo"
-    class="home-info"
-  >
-
-
-    <div class="info-card">
-
-      <div class="info-icon">
-        🔎
       </div>
 
-      <h3>
-        Smart Search
-      </h3>
 
-      <p>
-        Search websites and information quickly.
-      </p>
+      <div class="info-card">
 
-    </div>
+        <div
+          class="info-icon"
+          aria-hidden="true"
+        >
+          🌍
+        </div>
 
+        <h3>
+          Multilingual Search
+        </h3>
 
-    <div class="info-card">
+        <p>
+          Search with English, বাংলা, Banglish and Unicode text.
+        </p>
 
-      <div class="info-icon">
-        🤖
       </div>
 
-      <h3>
-        RFB Ask
-      </h3>
 
-      <p>
-        Ask questions and get quick AI answers.
-      </p>
+      <div class="info-card">
 
-    </div>
+        <div
+          class="info-icon"
+          aria-hidden="true"
+        >
+          ⚡
+        </div>
 
+        <h3>
+          Fast Search
+        </h3>
 
-    <div class="info-card">
+        <p>
+          A lightweight search experience designed for fast results.
+        </p>
 
-      <div class="info-icon">
-        🌍
       </div>
 
-      <h3>
-        Multilingual
-      </h3>
+    </section>
 
-      <p>
-        Supports English, বাংলা, Banglish and Unicode.
-      </p>
-
-    </div>
-
-
-    <div class="info-card">
-
-      <div class="info-icon">
-        ⚡
-      </div>
-
-      <h3>
-        Fast
-      </h3>
-
-      <p>
-        Lightweight and designed for fast searching.
-      </p>
-
-    </div>
-
-  </section>
+  </main>
 
 
   <!-- =====================================================
-       ABOUT
+       FOOTER
   ====================================================== -->
 
-  <section
-    id="about"
-    class="info-page"
-  >
+  <footer class="site-footer">
 
-    <div class="info-page-inner">
+    <div class="footer-inner">
 
-      <h2>
-        About Rise From Broken
-      </h2>
-
-
-      <p>
-
-        <strong>Rise From Broken</strong> is a safe, simple and
-        multilingual search engine designed to help people
-        discover information on the web.
-
-      </p>
-
-
-      <ul>
-
-        <li>
-          🔐 <strong>No Login Required</strong> —
-          Search without creating an account.
-        </li>
-
-
-        <li>
-          📚 <strong>Wikipedia Search</strong> —
-          Easily find information from Wikipedia.
-        </li>
-
-
-        <li>
-          🛡️ <strong>Safety Focused</strong> —
-          We aim to provide a clean and safe search experience.
-        </li>
-
-
-        <li>
-          👨‍👩‍👧‍👦 <strong>For Everyone</strong> —
-          Designed to be simple and easy to use for kids and adults.
-        </li>
-
-
-        <li>
-          🌐 <strong>Web Search</strong> —
-          Search for information from across the web.
-        </li>
-
-      </ul>
-
-
-      <p>
-
-        Rise From Broken does not require users to create an
-        account or log in to use the basic search features.
-
-      </p>
-
-    </div>
-
-  </section>
-
-
-  <!-- =====================================================
-       PRIVACY POLICY
-  ====================================================== -->
-
-  <section
-    id="privacy"
-    class="info-page"
-  >
-
-    <div class="info-page-inner">
-
-      <h2>
-        Privacy Policy
-      </h2>
-
-
-      <p>
-        <strong>Last updated: August 23, 2026</strong>
-      </p>
-
-
-      <p>
-
-        Rise From Broken respects your privacy. Our search engine
-        is designed to provide a simple search experience without
-        requiring users to create an account or log in.
-
-      </p>
-
-
-      <h3>
-        Information We Collect
-      </h3>
-
-
-      <p>
-
-        Rise From Broken does not require you to provide your name,
-        email address, password or other personal information to
-        use the basic search features.
-
-      </p>
-
-
-      <p>
-
-        Search queries may be sent to third-party services that
-        provide search, news, image, video or AI functionality.
-        These services may process requests according to their
-        own privacy policies.
-
-      </p>
-
-
-      <h3>
-        Third-Party Services
-      </h3>
-
-
-      <p>
-
-        Rise From Broken may use services such as Wikipedia,
-        Wikimedia Commons, YouTube, Google News, Supabase,
-        Tavily and AI services to provide search and AI features.
-
-      </p>
-
-
-      <p>
-
-        When you use these features, information necessary to
-        process your request may be transmitted to the relevant
-        third-party service.
-
-      </p>
-
-
-      <h3>
-        Cookies and Local Storage
-      </h3>
-
-
-      <p>
-
-        Rise From Broken may use browser local storage to remember
-        preferences such as the selected website theme.
-        We do not require cookies for user login or account
-        authentication.
-
-      </p>
-
-
-      <h3>
-        Children's Privacy
-      </h3>
-
-
-      <p>
-
-        Rise From Broken is designed to be simple and accessible
-        for general users, including children and adults.
-        However, search engines may display information from
-        external websites, and we cannot guarantee that every
-        external search result is appropriate for every age group.
-
-      </p>
-
-
-      <h3>
-        External Websites
-      </h3>
-
-
-      <p>
-
-        Search results may link to websites operated by third parties.
-        Rise From Broken does not control the content, privacy
-        practices or security of those external websites.
-
-      </p>
-
-
-      <h3>
-        Changes to This Policy
-      </h3>
-
-
-      <p>
-
-        We may update this Privacy Policy when necessary.
-        Any updated version will be published on this page.
-
-      </p>
-
-    </div>
-
-  </section>
-
-
-  <!-- =====================================================
-       TERMS
-  ====================================================== -->
-
-  <section
-    id="terms"
-    class="info-page"
-  >
-
-    <div class="info-page-inner">
-
-      <h2>
-        Terms of Use
-      </h2>
-
-
-      <p>
-
-        By using Rise From Broken, you agree to use the service
-        responsibly and lawfully.
-
-      </p>
-
-
-      <h3>
-        Use of the Service
-      </h3>
-
-
-      <p>
-
-        Rise From Broken is provided as a search and information
-        discovery service. You are responsible for how you use
-        information found through the service.
-
-      </p>
-
-
-      <h3>
-        Search Results
-      </h3>
-
-
-      <p>
-
-        Search results may come from external websites and
-        third-party services. Rise From Broken does not guarantee
-        the accuracy, completeness or availability of external
-        content.
-
-      </p>
-
-
-      <h3>
-        External Content
-      </h3>
-
-
-      <p>
-
-        Rise From Broken does not own or control content hosted on
-        external websites. Visiting an external website is your
-        responsibility and is subject to that website's own terms
-        and policies.
-
-      </p>
-
-
-      <h3>
-        AI Answers
-      </h3>
-
-
-      <p>
-
-        RFB Ask provides AI-generated answers to help users find
-        and understand information. AI answers may sometimes be
-        incomplete or incorrect and should be independently
-        verified when accuracy is important.
-
-      </p>
-
-
-      <h3>
-        Service Availability
-      </h3>
-
-
-      <p>
-
-        We aim to keep Rise From Broken available and functional,
-        but we cannot guarantee uninterrupted or error-free service.
-
-      </p>
-
-    </div>
-
-  </section>
-
-
-  <!-- =====================================================
-       CONTACT
-  ====================================================== -->
-
-  <section
-    id="contact"
-    class="info-page"
-  >
-
-    <div class="info-page-inner">
-
-      <h2>
-        Contact Rise From Broken
-      </h2>
-
-
-      <p>
-
-        If you have questions, suggestions, feedback or concerns
-        about Rise From Broken, you can contact us by email.
-
-      </p>
-
-
-      <p>
-
-        📧
+      <div class="footer-brand">
 
         <strong>
-          Email:
+          Rise From Broken
         </strong>
 
-        <a
-          href="mailto:risefrombroken@gmail.com"
-        >
-          risefrombroken@gmail.com
+        <span>
+          Smart Multilingual Search Engine
+        </span>
+
+      </div>
+
+
+      <nav
+        class="footer-links"
+        aria-label="Footer navigation"
+      >
+
+        <a href="/about.html">
+          About
         </a>
 
-      </p>
+        <a href="/privacy.html">
+          Privacy
+        </a>
+
+        <a href="/terms.html">
+          Terms
+        </a>
+
+        <a href="/contact.html">
+          Contact
+        </a>
+
+      </nav>
 
 
       <p>
-
-        We will try to review your message and respond when possible.
-
+        © 2026 Rise From Broken
       </p>
 
     </div>
 
-  </section>
+  </footer>
 
 
-</main>
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
 
-
-<!-- =====================================================
-     FOOTER
-====================================================== -->
-
-<footer class="site-footer">
-
-  <div class="footer-inner">
-
-
-    <div class="footer-brand">
-
-      <strong>
-        Rise From Broken
-      </strong>
-
-      <span>
-        Search Engine
-      </span>
-
-    </div>
-
-
-    <div class="footer-links">
-
-      <a href="#about">
-        About
-      </a>
-
-      <a href="#privacy">
-        Privacy Policy
-      </a>
-
-      <a href="#terms">
-        Terms
-      </a>
-
-      <a href="#contact">
-        Contact
-      </a>
-
-    </div>
-
-
-    <p>
-      © 2026 Rise From Broken
-    </p>
-
-  </div>
-
-</footer>
-
-
-<!-- =====================================================
-     JAVASCRIPT
-====================================================== -->
-
-<script src="config.js"></script>
-
-<script src="app.js"></script>
-
+  <script src="config.js"></script>
+  <script src="app.js"></script>
 
 </body>
+
 </html>
