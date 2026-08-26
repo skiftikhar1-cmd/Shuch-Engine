@@ -13,17 +13,17 @@
 
   <url>
     <loc>https://rise-from-broken.vercel.app/privacy.html</loc>
-    <priority>0.6</priority>
+    <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://rise-from-broken.vercel.app/terms.html</loc>
-    <priority>0.6</priority>
+    <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://rise-from-broken.vercel.app/contact.html</loc>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
 
 </urlset>
